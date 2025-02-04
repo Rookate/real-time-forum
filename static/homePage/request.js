@@ -303,5 +303,3 @@ export function DisplayReport(report, request, historyRequestContainer = false) 
     }
 
 }
-
-// Appeler fetch post pour avoir les infos du post puis utiliser ces infos pour contruire le post et en même temps mettre le message de report

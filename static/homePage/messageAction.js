@@ -75,8 +75,8 @@ export async function updateComment(comment_id, updatedContent) {
     }
 }
 
-export async function deleteComment(post_uuid, comment_id) {
-    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce post ?");
+export async function deleteComment(comment_id) {
+    const confirmDelete = confirm("Êtes-vous sûr de vouloir supprimer ce commentaire ?");
     if (!confirmDelete) return;
 
     try {
