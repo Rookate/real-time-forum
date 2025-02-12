@@ -26,7 +26,6 @@ export function hideAllSections() {
 
 // Afficher une section spécifique
 export function showSection(section) {
-    console.log(section)
     hideAllSections();
     section.style.display = 'block';
 }

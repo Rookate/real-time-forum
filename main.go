@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"forum/server/api/categories"
 	comments "forum/server/api/comment"
+	apiConversations "forum/server/api/conversations"
 	authentification "forum/server/api/login"
+	apiMessages "forum/server/api/message"
 	"forum/server/api/notifications"
 	"forum/server/api/post"
 	"forum/server/api/providers"
 	"forum/server/api/requests"
 	users "forum/server/api/user"
 	"forum/server/middleware"
+	ws "forum/server/websocket"
 	"html/template"
 	"log"
 	"net/http"
@@ -41,6 +44,15 @@ func main() {
 	mux := http.NewServeMux()
 
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	// ------------------ WebSocket --------------------------------
+	go ws.HandleMessages()
+	mux.HandleFunc("/ws", ws.WsHandler)
+	//http.HandleFunc(`/conversation/`, ws.ConversationHandler)
+	mux.HandleFunc("/api/message/createMessage", apiMessages.CreateMessage)
+	mux.HandleFunc("/api/message/getMessage", apiMessages.GetMessageByConversation)
+	mux.HandleFunc("/api/conversations/createConversation", apiConversations.CreateConversation)
+	// ----------------------------------------------------------------
 
 	mux.HandleFunc("/api/post/createPost", post.CreatePostHandler)
 	mux.HandleFunc("/api/post/fetchPost", post.FetchPostHandler)

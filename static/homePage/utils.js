@@ -22,6 +22,9 @@
 //     return uuid.replace(/"/g, '');
 // }
 
+// export let userInfo = null;
+
+
 export async function getPPFromID(id) {
     var pp = "";
 
@@ -118,3 +121,8 @@ document.querySelectorAll('.categorie').forEach(categorie => {
     const randomColor = startGradientAnimation();
     categorie.style.backgroundColor = randomColor;
 });
+
+export function updateURL(conversationUUID) {
+    const newURL = `/conversation/${conversationUUID}`;
+    window.history.pushState({}, "", newURL);
+}

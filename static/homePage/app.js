@@ -32,6 +32,7 @@ export async function fetchUserInfo() {
 
         const data = await response.json();
         UserInfo = data;
+        console.log("User info fetched", UserInfo);
 
     } catch (error) {
         console.error(error);
@@ -169,7 +170,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const elementsToHide = [
         document.getElementById('notifications-link'),
         document.getElementById('request-link'),
-        document.getElementById('moderation-link')
+        document.getElementById('moderation-link'),
+        document.getElementById('private-message-link'),
     ];
 
     // Remove each element

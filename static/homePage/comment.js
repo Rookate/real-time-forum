@@ -18,7 +18,7 @@ const AppState = {
     NOTIFS: "notification",
     REQUEST: "request",
     MODERATION: "moderation",
-    // DIRECT_MESSAGE: "Direct Message"
+    DIRECT_MESSAGE: "Direct Message"
 };
 
 // Map pour stocker les event listeners
@@ -111,11 +111,15 @@ export function updateAppState(newState, pushState = true) {
             case AppState.REQUEST:
                 url = "#request";
                 break;
+            case AppState.DIRECT_MESSAGE:
+                url = "#direct-message";
+                break;
             default:
                 url = '#home';
                 break;
         }
-        history.pushState(newState, '', url);
+        window.history.pushState({}, "", url);
+
     }
 }
 

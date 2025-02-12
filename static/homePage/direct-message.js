@@ -1,97 +1,101 @@
 import { fetchAllUsers } from "./api/fetchAllUsers.js";
-import { getConversation } from "./api/fetchConversation.js";
+import { createConversation } from "./api/createConversation.js";
+import { updateURL } from "./utils.js";
+import { fetchMessages } from "./api/fetchMessages.js";
+import { sendMessage } from "./api/createMessage.js";
+
+
+export let ws;
+export let typingTimeout;
 
 // Container
 const container = document.querySelector('.chat[data-section="private-message"]');
 const sidebar = document.getElementById('sidebar');
 
-// Exemple de données
-const conversationData = {
-    username: "Luna",
-    profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    // messages: [
-    //     {
-    //         username: "Rokat",
-    //         profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //         content: "C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille le fonctionnement du lapsus.",
-    //         date: "Wed, 05 February 2025 11:40"
-    //     },
-    //     {
-    //         username: "Luna",
-    //         profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //         content: "Ce concept de lapsus révèle beaucoup sur la relation entre le conscient et l'inconscient.",
-    //         date: "Wed, 05 February 2025 11:45"
-    //     },
-    //     {
-    //         username: "Rokat",
-    //         profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //         content: "C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille le fonctionnement du lapsus.",
-    //         date: "Wed, 05 February 2025 11:40"
-    //     },
-    // {
-    //     username: "Luna",
-    //     profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //     content: "Ce concept de lapsus révèle beaucoup sur la relation entre le conscient et l'inconscient.",
-    //     date: "Wed, 05 February 2025 11:45"
-    // },
-    // {
-    //     username: "Rokat",
-    //     profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //     content: "C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille le fonctionnement du lapsus.",
-    //     date: "Wed, 05 February 2025 11:40"
-    // },
-    // {
-    //     username: "Luna",
-    //     profile_picture: "https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg",
-    //     content: "Ce concept de lapsus révèle beaucoup sur la relation entre le conscient et l'inconscient.",
-    //     date: "Wed, 05 February 2025 11:45"
-    // }
-    // ]
+const divContainer = document.createElement('div');
+divContainer.classList.add("message-container-div");
+
+
+
+ws = new WebSocket("ws://localhost:8080/ws");
+ws.onopen = function () {
+    console.log("----------------------------------------------------------------")
+    fetchMessages();
+}
+ws.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    if (data.type === "single_message") {
+        console.log("data", data)
+        displaySingleMessage(data);
+
+    } else if (data.type === "messages") {
+        displayMessage(data);
+    }
 };
 
 function conversation(obj) {
+    const conversationUUID = obj.conversation_uuid;
+    //  console.log("Conversation", conversationUUID)
+    updateURL(conversationUUID)
+
     container.innerHTML = '';
     // Header
     const header = displayHeader(obj);
     container.appendChild(header);
 
     // Display the conversation messages
-    displayMessage(obj.messages);
+    fetchMessages(conversationUUID);
 
-    // Display the input area
-    const input = displayInput(obj);
-    container.appendChild(input);
-}
-
-function displayMessage(messages) {
-    if (!messages || messages.length === 0) {
+    if (!obj.messages || obj.messages.length === 0) {
         const noMessage = document.createElement('span');
         noMessage.classList.add('no-msg-content')
         noMessage.textContent = "Start a new conversation with @Rokat"
 
-        container.appendChild(noMessage)
-        return
+        divContainer.appendChild(noMessage)
+        container.appendChild(divContainer);
+    } else {
+        displayMessage(obj.messages);
     }
 
-    const divContainer = document.createElement('div');
-    divContainer.classList.add("message-container-div");
+    // Display the input area
+    const input = displayInput(obj);
+    console.log(obj);
+    container.appendChild(input);
+}
 
-    messages.forEach(messageData => {
+function displayMessage(data) {
+    divContainer.innerHTML = '';
+
+    data.messages.forEach(messageData => {
         const chat = document.createElement('div');
         chat.classList.add('message');
 
         // Message content
         const messageContent = displayContentMessage(messageData);
+        chat.appendChild(messageContent);
 
         // Append to container
-        chat.appendChild(messageContent);
         divContainer.appendChild(chat);
     });
+}
 
-    container.appendChild(divContainer);
+function displaySingleMessage(message) {
+    // console.log("ça", message);
+
+    const chat = document.createElement('div');
+    chat.classList.add('message');
+
+    // Message content
+    const messageContent = displayContentMessage(message);
+
+    // Append to container
+    chat.appendChild(messageContent);
+    divContainer.appendChild(chat);
 }
 
 function displayContentMessage(content) {
+    // console.log("çOOOOOOOOa", content);
+
     const userMessage = document.createElement('div');
     userMessage.classList.add('user-message');
 
@@ -101,8 +105,9 @@ function displayContentMessage(content) {
 
     const image = document.createElement('img');
     image.classList.add('pp-discord');
-    image.src = content.profile_picture;
-    image.alt = content.username;
+    image.src = content.sender_profile_picture;
+    image.alt = content.sender_username
+        ;
 
     // User message container
     const userMessageContainer = document.createElement('div');
@@ -114,11 +119,12 @@ function displayContentMessage(content) {
 
     const username = document.createElement('span');
     username.classList.add('username');
-    username.textContent = content.username;
+    username.textContent = content.sender_username
+        ;
 
     const timestamp = document.createElement('span');
     timestamp.classList.add('timestamp');
-    timestamp.textContent = content.date;
+    timestamp.textContent = content.created_at;
 
     const contentMessage = document.createElement('p');
     contentMessage.textContent = content.content;
@@ -140,11 +146,11 @@ function displayHeader(content) {
 
     const image = document.createElement('img');
     image.classList.add('pp-header-discord');
-    image.src = content.profile_picture;
-    image.alt = content.username;
+    image.src = content.profile_picture || "https://upload.wikimedia.org/wikipedia/commons/8/87/Chimpanzee-Head.jpg?uselang=fr";
+    image.alt = content.receiver_username;
 
     const username = document.createElement('span');
-    username.textContent = content.username;
+    username.textContent = content.receiver_username;
 
     header.appendChild(image);
     header.appendChild(username);
@@ -153,12 +159,19 @@ function displayHeader(content) {
 }
 
 function displayInput(content) {
+    console.log("display", content);
     const inputUser = document.createElement('div');
     inputUser.classList.add('input-user');
 
     const input = document.createElement('input');
     input.type = "text";
-    input.placeholder = `Message @${content.username}`;
+    input.id = 'messageInput'
+    input.placeholder = `Message @${content.receiver_username}`;
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage(content.conversation_uuid, content.reciever, content.sender, content.sender_username, content.sen);
+        }
+    })
 
     const sendButton = document.createElement('button');
     sendButton.id = "send-chat";
@@ -239,18 +252,21 @@ function createFriendList(friends) {
 }
 
 async function showConversation(user_uuid) {
-    const conv = await getConversation(user_uuid);
+    container.innerHTML = "";
+    const conv = await createConversation(user_uuid);
+    console.log("cc", conv);
     if (conv) {
         conversation(conv);
     }
 }
 
 export async function showFriendsList() {
+    container.innerHTML = "";
     sidebar.classList.add('close');
 
     const users = await fetchAllUsers()
-    // const friendsList = createFriendList(users)
-    // container.appendChild(friendsList)
+    const friendsList = createFriendList(users)
+    container.appendChild(friendsList)
 }
 
 const messages = [
@@ -270,3 +286,12 @@ const messages = [
 ];
 
 //
+
+ws.onclose = function () {
+    console.log("WebSocket connection closed, retrying...");
+    setTimeout(connect, 1000); // Reconnect after 1 second
+};
+
+ws.onerror = function (error) {
+    console.error("WebSocket error:", error);
+};

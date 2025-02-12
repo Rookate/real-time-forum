@@ -116,6 +116,32 @@ func createTables(db *sql.DB) {
         FOREIGN KEY (user_uuid) REFERENCES users(user_uuid)
     );`
 
+	createConversationTable := `
+	CREATE TABLE IF NOT EXISTS conversations (
+  conversation_uuid TEXT PRIMARY KEY,
+  sender TEXT,
+  reciever TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender) REFERENCES users(user_uuid),
+  FOREIGN KEY (reciever) REFERENCES users(user_uuid)
+);
+`
+
+	createMessagesTable := `
+  CREATE TABLE IF NOT EXISTS messages (
+  message_uuid TEXT PRIMARY KEY,
+  conversation_uuid TEXT,
+  sender_uuid TEXT,
+  receiver_uuid TEXT,
+  content TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_deleted BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (conversation_uuid) REFERENCES conversations(conversation_uuid),
+  FOREIGN KEY (sender_uuid) REFERENCES users(user_uuid),
+  FOREIGN KEY (receiver_uuid) REFERENCES users(user_uuid)
+);
+`
+
 	// Exécution des requêtes pour créer les tables
 	statements := []struct {
 		name      string
@@ -126,6 +152,8 @@ func createTables(db *sql.DB) {
 		{"comments", createCommentsTable},
 		{"post_reactions", createPostsReactionsTable},
 		{"comment_reactions", createCommentReactionsTable},
+		{"conversations", createConversationTable},
+		{"messages", createMessagesTable},
 	}
 
 	var createdTables []string
