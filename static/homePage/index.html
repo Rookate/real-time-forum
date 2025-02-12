@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/static/homePage/style.css">
     <link rel="stylesheet" href="/static/homePage/responsive.css">
     <link rel="stylesheet" href="/static/homePage/dashboard.css">
+    <link rel="stylesheet" href="/static/homePage/private-message.css">
     <title>Forum</title>
 </head>
 
@@ -47,6 +48,16 @@
                                 d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
                         </svg>
                         <span>Dashboard</span>
+
+                    </a>
+                </li>
+                <li>
+                    <a href="#Private_message" id="private-message-link">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="icon">
+                            <path
+                                d="M208 352c114.9 0 208-78.8 208-176S322.9 0 208 0S0 78.8 0 176c0 38.6 14.7 74.3 39.6 103.4c-3.5 9.4-8.7 17.7-14.2 24.7c-4.8 6.2-9.7 11-13.3 14.3c-1.8 1.6-3.3 2.9-4.3 3.7c-.5 .4-.9 .7-1.1 .8l-.2 .2s0 0 0 0s0 0 0 0C1 327.2-1.4 334.4 .8 340.9S9.1 352 16 352c21.8 0 43.8-5.6 62.1-12.5c9.2-3.5 17.8-7.4 25.2-11.4C134.1 343.3 169.8 352 208 352zM448 176c0 112.3-99.1 196.9-216.5 207C255.8 457.4 336.4 512 432 512c38.2 0 73.9-8.7 104.7-23.9c7.5 4 16 7.9 25.2 11.4c18.3 6.9 40.3 12.5 62.1 12.5c6.9 0 13.1-4.5 15.2-11.1c2.1-6.6-.2-13.8-5.8-17.9c0 0 0 0 0 0s0 0 0 0l-.2-.2c-.2-.2-.6-.4-1.1-.8c-1-.8-2.5-2-4.3-3.7c-3.6-3.3-8.5-8.1-13.3-14.3c-5.5-7-10.7-15.4-14.2-24.7c24.9-29 39.6-64.7 39.6-103.4c0-92.8-84.9-168.9-192.6-175.5c.4 5.1 .6 10.3 .6 15.5z" />
+                        </svg>
+                        <span>Direct Message</span>
 
                     </a>
                 </li>
@@ -155,6 +166,109 @@
                         <!-- ici va se trouver les posts -->
                     </ul>
                 </div>
+        </section>
+
+        <section id="private-message-section" class="section" style="display: none;">
+            <div id="chat-center-private-message">
+                <nav id="conversations-list">
+                    <!-- <header>Friends</header> -->
+                    <header id="conversation-header">Conversations</header>
+                    <div class="conversation-item">
+                        <div class="image-container">
+                            <img class="pp-discord"
+                                src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                alt="yes">
+                        </div>
+                        <span>Rokat</span>
+                    </div>
+                    <div class="conversation-item">
+                        <div class="image-container">
+                            <img class="pp-discord"
+                                src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                alt="yes">
+                        </div>
+                        <span>Rokat</span>
+                    </div>
+                    <div class="conversation-item">
+                        <div class="image-container">
+                            <img class="pp-discord"
+                                src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                alt="yes">
+                        </div>
+                        <span>Rokat</span>
+                    </div>
+                </nav>
+                <div class="chat" data-section="private-message">
+                    <!-- <header>
+                        <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                            class="pp-header-discord">
+                        <span>Rokat</span>
+                    </header>-->
+
+                    <!-- <div class="message">
+                        <div class="user-message">
+                            <div class="profile-picture-user">
+                                <img class="pp-discord"
+                                    src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                    alt="">
+                            </div>
+                            <div class="user-message-container">
+                                <div class="user-info">
+                                    <span class="username">Rokat</span>
+                                    <span class="timestamp">Wed, 05 Febuary 2025 11:40</span>
+                                </div>
+                                <p>
+                                    C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille
+                                    le
+                                    plus précisément le fonctionnement du lapsus tel qu'il le comprend.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="user-message">
+                            <div class="profile-picture-user">
+                                <img class="pp-discord"
+                                    src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                    alt="">
+                            </div>
+                            <div class="user-message-container">
+                                <div class="user-info">
+                                    <span class="username">Rokat</span>
+                                    <span class="timestamp">Wed, 05 Febuary 2025 11:40</span>
+                                </div>
+                                <p>
+                                    C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille
+                                    le
+                                    plus précisément le fonctionnement du lapsus tel qu'il le comprend.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="user-message">
+                            <div class="profile-picture-user">
+                                <img class="pp-discord"
+                                    src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                    alt="">
+                            </div>
+                            <div class="user-message-container">
+                                <div class="user-info">
+                                    <span class="username">Rokat</span>
+                                    <span class="timestamp">Wed, 05 Febuary 2025 11:40</span>
+                                </div>
+                                <p>
+                                    C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille
+                                    le
+                                    plus précisément le fonctionnement du lapsus tel qu'il le comprend.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-user">
+                        <input type="text" placeholder="Message @Rokat">
+                        <button id="send-chat">Send</button>
+                    </div>
+                </div>
+            </div> -->
+
         </section>
 
         <section id="search-section" class="section" style="display: none;">
@@ -271,3 +385,42 @@
 </body>
 
 </html>
+
+
+<!-- <div class="friend-list">
+                        <div id="search-friend-div">
+                            <input type="text" id="input-friends-list" placeholder="Search">
+                        </div>
+
+
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                        <div class="friend">
+                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                                class="pp-header-discord">
+                            <span>Rokat</span>
+                        </div>
+                    </div> -->

@@ -57,20 +57,32 @@ function applyMode(mode) {
     const root = document.documentElement;
 
     if (mode === 'dark') {
-        root.style.setProperty('--background-color', '#1C1C1C');
-        root.style.setProperty('--text-color', '#000000');
+        root.style.setProperty('--background-color', '#36393F');
+        root.style.setProperty('--text-color', '#DCDDDE');
         root.style.setProperty('--second-text-color', '#FFFFFF');
-        root.style.setProperty('--border-color', '#5E5E5F');
-        root.style.setProperty('--background-message-color', '#272727');
+        root.style.setProperty('--border-color', '#51545c');
+        root.style.setProperty('--background-message-color', '#2F3136');
+        root.style.setProperty('--accent-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--online-color', '#3BA55C'); // Vert (en ligne)
+        root.style.setProperty('--offline-color', '#ED4245'); // Rouge (hors ligne)
+        root.style.setProperty('--busy-color', '#FAA61A'); // Orange (occupé)
+        root.style.setProperty('--idle-color', '#F0B126'); // Jaune (AFK)
         darkModeToggles.textContent = 'Light Mode';
     } else {
-        root.style.setProperty('--background-color', '#f5f5f5');
-        root.style.setProperty('--text-color', '#FFFFFF');
-        root.style.setProperty('--second-text-color', '#000000');
-        root.style.setProperty('--border-color', '#9C9FA8');
-        root.style.setProperty('--background-message-color', '#FFFFFF');
+        root.style.setProperty('--background-color', '#FFFFFF');
+        root.style.setProperty('--text-color', '#202225'); // Texte sombre
+        root.style.setProperty('--second-text-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--border-color', '#E3E5E8'); // Bordure claire
+        root.style.setProperty('--background-message-color', '#F6F6F7'); // Fond clair pour les messages
+        root.style.setProperty('--accent-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--online-color', '#3BA55C'); // Vert (en ligne)
+        root.style.setProperty('--offline-color', '#ED4245'); // Rouge (hors ligne)
+        root.style.setProperty('--busy-color', '#FAA61A'); // Orange (occupé)
+        root.style.setProperty('--idle-color', '#F0B126'); // Jaune (AFK)
         darkModeToggles.textContent = 'Dark Mode';
     }
+
+
 
     // Enregistrer la préférence dans le Local Storage
     localStorage.setItem('theme', mode);

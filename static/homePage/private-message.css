@@ -1,0 +1,238 @@
+* {
+    padding: 0;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    color: var(--second-text-color);
+    box-sizing: border-box;
+}
+
+
+:root {
+    --background-color: #f1f1f1;
+    --border-color: #9C9FA8;
+    --background-modal-color: #080707;
+    --description-color: #a2a2a2;
+    --text-color: #FFFFFF;
+    --second-text-color: #000000;
+    --error-color: #B3001B;
+    --like-color: #f94762;
+    --primary-colors: #866fc5;
+    --primary-color: #3c85de;
+    --accent-color: #317ad3;
+    --background-message-color: #FFFFFF;
+    --hover-color: rgba(69, 69, 69, 0.3);
+    --dark-color: #2e3033;
+}
+
+#conversation-header {
+    margin-bottom: 15px;
+}
+
+
+.pp-discord {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+#conversations-list {
+    padding: 0 30px;
+    background-color: var(--dark-color);
+    height: 100vh;
+    min-width: 250px;
+    max-width: 20%;
+    border-right: 0.5px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.conversation-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    border-radius: 8px;
+    gap: 15px;
+    transition: background-color .1s ease;
+    cursor: pointer;
+}
+
+.conversation-item:hover {
+    background-color: var(--hover-color);
+}
+
+.conversation-item span {
+    font-size: 18px;
+}
+
+#conversations-list header:first-child {
+    padding: 1em 0;
+    font-size: 18px;
+}
+
+#chat-center-private-message {
+    display: flex;
+}
+
+.chat header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid rgb(65, 65, 65);
+    padding: 15px;
+}
+
+.pp-header-discord {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.message {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    padding: 15px;
+    height: fit-content;
+}
+
+.message:first-child {
+    margin-top: auto;
+}
+
+.user-message-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.user-message-container .username {
+    font-weight: 600;
+}
+
+.user-message-container .timestamp {
+    color: var(--description-color);
+}
+
+.user-message-container .user-info {
+    display: flex;
+    gap: 10px;
+}
+
+.user-message {
+    display: flex;
+    gap: 10px;
+}
+
+.message-container-div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.input-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    margin: 15px 0;
+    width: 100%;
+    padding-left: 15px;
+}
+
+.input-user input {
+    padding: 10px 15px;
+    background-color: #343434;
+    width: 100%;
+    border: none;
+    border-radius: 8px;
+    outline: none
+}
+
+.input-user input::placeholder {
+    color: var(--text-color);
+}
+
+.chat {
+    display: flex;
+    background-color: var(--background-color);
+    width: 100%;
+    height: 100vh;
+    flex-direction: column;
+}
+
+#send-chat {
+    width: 60px;
+    height: 40px;
+    border: none;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+#search-friend-div {
+    align-self: center;
+    padding: 40px;
+    display: flex;
+    width: 70%;
+}
+
+#input-friends-list {
+    padding: 15px;
+    width: 100%;
+    color: var(--text-color);
+    outline: none;
+    border: none;
+    border-radius: 12px;
+    background-color: var(--dark-color);
+}
+
+.friend-list {
+    padding: 30px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.friend {
+    display: flex;
+    align-items: center;
+    position: relative;
+    gap: 13px;
+    padding: 15px;
+    border-radius: 8px;
+    transition: background-color .1s ease;
+    cursor: pointer;
+}
+
+.friend::after {
+    position: absolute;
+    content: '';
+    transform: translate(-1%, 0);
+    width: 100%;
+    height: 100%;
+    border-bottom: 0.5px solid var(--border-color);
+}
+
+.friend:hover {
+    background-color: var(--dark-color);
+}
+
+.friend span {
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.friend img {
+    width: 40px;
+    height: 40px;
+}
+
+.no-msg-content {
+    height: 100%;
+    margin-top: 40vh;
+    text-align: center;
+}
