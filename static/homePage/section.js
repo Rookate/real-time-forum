@@ -10,6 +10,7 @@ const notificationsSection = document.getElementById('notifications-section');
 const trendingSection = document.getElementById('trending-section');
 const requestSection = document.getElementById('request-section');
 const moderationSection = document.getElementById('moderation-section');
+const privateMessageSection = document.getElementById('private-message-section')
 
 // Masquer toutes les sections
 export function hideAllSections() {
@@ -20,10 +21,12 @@ export function hideAllSections() {
     trendingSection.style.display = 'none';
     requestSection.style.display = 'none';
     moderationSection.style.display = 'none';
+    privateMessageSection.style.display = 'none'
 }
 
 // Afficher une section spécifique
 export function showSection(section) {
+    console.log(section)
     hideAllSections();
     section.style.display = 'block';
 }
@@ -32,6 +35,7 @@ export function showSection(section) {
 export function initSectionEvents(UserInfo) {
     document.getElementById('home-link').addEventListener('click', () => showSection(homeSection));
     document.getElementById('search-link').addEventListener('click', () => showSection(searchSection));
+    document.getElementById('private-message-link').addEventListener('click', () => showSection(privateMessageSection))
 
 
     if (UserInfo) {

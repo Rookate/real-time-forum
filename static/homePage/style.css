@@ -7,6 +7,7 @@
 }
 
 :root {
+    --dark-color: #2e3033;
     --background-color: #f1f1f1;
     --border-color: #9C9FA8;
     --background-modal-color: #080707;
@@ -29,7 +30,7 @@ body {
 }
 
 #sidebar {
-    background-color: transparent;
+    background-color: var(--dark-color);
     width: 240px;
     display: flex;
     flex-direction: column;
@@ -244,14 +245,10 @@ body {
     flex-grow: 1;
     list-style: none;
     overflow-y: auto;
-    padding: 0;
     overflow-x: hidden;
     max-height: 94vh;
-    margin-right: 80px;
-    width: 45vw;
-    border: 1px solid var(--border-color);
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    width: 100%;
+    padding: 0 60px;
 }
 
 .users-post>li:last-child:nth-child(odd) {
@@ -264,7 +261,6 @@ body {
 .message-item {
     display: flex;
     position: relative;
-    background-color: var(--background-message-color);
     padding: 25px;
     border-bottom: 1px solid var(--border-color);
     animation: fadeIn 0.85s forwards;
@@ -593,8 +589,8 @@ body {
     display: flex;
     overflow-y: hidden;
     align-items: center;
-    justify-content: center;
-    margin: 0 auto;
+    width: 100%;
+
 }
 
 .tendances {
@@ -902,12 +898,14 @@ body {
 }
 
 .chat-center[data-section="request"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-direction: column;
     height: 100vh;
 }
 
 .request-title {
-    margin-top: -200px;
     margin-bottom: 40px;
     font-size: 34px;
 }
@@ -989,14 +987,13 @@ ul {
 }
 
 #history-users-request {
-    position: relative;
-    top: 15%;
     display: flex;
     flex-direction: column;
     gap: 15px;
     overflow-y: auto;
-    max-height: 30vh;
+    max-height: 60vh;
     scrollbar-width: none;
+    margin-top: 30px;
 }
 
 
