@@ -37,15 +37,11 @@ func CreateMessage(db *sql.DB, r *http.Request, params map[string]interface{}) (
 		return nil, fmt.Errorf("UUID de conversation manquant")
 	}
 
-	fmt.Println("UUID Récupéré lors de la création du message:", conversation_uuid)
-
 	user2, _ := params["receiver_uuid"].(string)
-	fmt.Println("UUID de l'utilisateur 2:", user2)
 	sender_uuid, _ := authentification.GetUserFromCookie(r)
 	receiver_uuid := user2
 
 	content, _ := params["content"].(string)
-	fmt.Println("Message 1", content)
 	creationDate := time.Now()
 	is_deleted := false
 

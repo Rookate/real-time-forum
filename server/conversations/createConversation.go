@@ -20,35 +20,46 @@ type Conversation struct {
 
 func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface{}) (*Conversation, error) {
 	user2, _ := params["user_uuid"].(string)
-	sender, _ := authentification.GetUserFromCookie(r)
-	receiver := user2
-	var receiverPicture, receiverUsername, conversationID string
+	currentUser, _ := authentification.GetUserFromCookie(r)
 
-	// Vérifier si une conversation existe déjà entre les deux utilisateurs
+	var otherUserPicture, otherUserUsername, conversationID string
+
+	// Vérifier si une conversation existe déjà
 	existingConversation := `
-	SELECT 
-	    c.conversation_uuid, 
-	    u.profile_picture, 
-	    u.username
-	FROM 
-	    conversations c
-	JOIN 
-	    users u ON u.user_uuid = c.reciever
-	WHERE 
-	    (c.sender = ? AND c.reciever = ?) 
-	    OR 
-	    (c.sender = ? AND c.reciever = ?);
-	`
+    SELECT 
+        c.conversation_uuid,
+        CASE 
+            WHEN c.sender = ? THEN u2.profile_picture
+            ELSE u1.profile_picture
+        END as other_picture,
+        CASE 
+            WHEN c.sender = ? THEN u2.username
+            ELSE u1.username
+        END as other_username
+    FROM 
+        conversations c
+    JOIN 
+        users u1 ON u1.user_uuid = c.sender
+    JOIN 
+        users u2 ON u2.user_uuid = c.reciever
+    WHERE 
+        (c.sender = ? AND c.reciever = ?) 
+        OR (c.sender = ? AND c.reciever = ?)
+    `
 
-	err := db.QueryRow(existingConversation, sender, receiver, sender, receiver).Scan(&conversationID, &receiverPicture, &receiverUsername)
+	err := db.QueryRow(existingConversation,
+		currentUser, currentUser, // Pour les CASE
+		currentUser, user2, // Premier cas
+		user2, currentUser, // Deuxième cas
+	).Scan(&conversationID, &otherUserPicture, &otherUserUsername)
+
 	if err == nil {
-		// Une conversation existe déjà, la retourner sans en créer une nouvelle
 		return &Conversation{
 			ConversationID:   conversationID,
-			User1ID:          sender,
-			User2ID:          receiver,
-			ReceiverUsername: receiverUsername,
-			ReceiverPicture:  receiverPicture,
+			User1ID:          currentUser,
+			User2ID:          user2,
+			ReceiverPicture:  otherUserPicture,
+			ReceiverUsername: otherUserUsername,
 		}, nil
 	} else if err != sql.ErrNoRows {
 		return nil, fmt.Errorf("erreur lors de la vérification de la conversation: %v", err)
@@ -60,57 +71,54 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 		return nil, fmt.Errorf("erreur lors de la génération du UUID: %v", err)
 	}
 
-	// Insertion dans la base de données
+	// Création de la nouvelle conversation
 	creationDate := time.Now()
 	createConversationQuery := `INSERT INTO conversations (conversation_uuid, sender, reciever, created_at) VALUES (?,?,?,?)`
-	_, err = db.Exec(createConversationQuery, conversationUUID, sender, receiver, creationDate)
+	_, err = db.Exec(createConversationQuery, conversationUUID, currentUser, user2, creationDate)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la création de la conversation: %v", err)
 	}
 
-	// Récupérer la photo de profil et le nom d'utilisateur du receiver
-	err = db.QueryRow(`SELECT profile_picture, username FROM users WHERE user_uuid = ?`, receiver).Scan(&receiverPicture, &receiverUsername)
+	// Récupérer les infos de l'autre utilisateur
+	err = db.QueryRow(`SELECT profile_picture, username FROM users WHERE user_uuid = ?`, user2).Scan(&otherUserPicture, &otherUserUsername)
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la récupération des informations du receiver: %v", err)
+		return nil, fmt.Errorf("erreur lors de la récupération des informations de l'autre utilisateur: %v", err)
 	}
 
-	// Créer et retourner la nouvelle conversation
-	newConversation := &Conversation{
+	return &Conversation{
 		ConversationID:   conversationUUID,
-		User1ID:          sender,
-		User2ID:          receiver,
+		User1ID:          currentUser,
+		User2ID:          user2,
 		CreatedAt:        creationDate,
-		ReceiverUsername: receiverUsername,
-		ReceiverPicture:  receiverPicture,
-	}
-
-	return newConversation, nil
+		ReceiverPicture:  otherUserPicture,
+		ReceiverUsername: otherUserUsername,
+	}, nil
 }
 
 func GetConversations(db *sql.DB, user_uuid string) ([]Conversation, error) {
 	getConversations := `
-	SELECT 
-    c.conversation_uuid, 
-    c.created_at,
-    CASE 
-        WHEN c.sender = ? THEN u2.user_uuid
-        ELSE u1.user_uuid
-    END AS receiver_uuid,
-    CASE 
-        WHEN c.sender = ? THEN u2.profile_picture
-        ELSE u1.profile_picture
-    END AS receiver_profile_picture,
-    CASE 
-        WHEN c.sender = ? THEN u2.username
-        ELSE u1.username
-    END AS receiver_username
-FROM 
-    conversations c
-JOIN users u1 ON u1.user_uuid = c.sender
-JOIN users u2 ON u2.user_uuid = c.reciever
-WHERE 
-    c.sender = ? OR c.reciever = ?;
-	`
+    SELECT 
+        c.conversation_uuid, 
+        c.created_at,
+        CASE 
+            WHEN c.sender = ? THEN c.reciever
+            ELSE c.sender
+        END AS other_user_uuid,
+        CASE 
+            WHEN c.sender = ? THEN u2.profile_picture
+            ELSE u1.profile_picture
+        END AS other_user_profile_picture,
+        CASE 
+            WHEN c.sender = ? THEN u2.username
+            ELSE u1.username
+        END AS other_user_username
+    FROM 
+        conversations c
+    JOIN users u1 ON u1.user_uuid = c.sender
+    JOIN users u2 ON u2.user_uuid = c.reciever
+    WHERE 
+        c.sender = ? OR c.reciever = ?;
+    `
 
 	rows, err := db.Query(getConversations, user_uuid, user_uuid, user_uuid, user_uuid, user_uuid)
 	if err != nil {
@@ -121,12 +129,17 @@ WHERE
 	var conversations []Conversation
 	for rows.Next() {
 		var conversation Conversation
-		err := rows.Scan(&conversation.ConversationID, &conversation.CreatedAt, &conversation.User2ID, &conversation.ReceiverPicture, &conversation.ReceiverUsername)
+		err := rows.Scan(
+			&conversation.ConversationID,
+			&conversation.CreatedAt,
+			&conversation.User2ID,
+			&conversation.ReceiverPicture,
+			&conversation.ReceiverUsername,
+		)
 		if err != nil {
 			return nil, fmt.Errorf("erreur lors du scan des conversations: %v", err)
 		}
 		conversations = append(conversations, conversation)
-		fmt.Println(conversations)
 	}
 
 	return conversations, nil

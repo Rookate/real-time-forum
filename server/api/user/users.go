@@ -89,11 +89,12 @@ func FetchUserByEmail(email string) (User, error) {
 		newUser.Role = v.(string)
 	}
 	if v, ok := result["created_at"]; ok && v != nil {
-		parsedTime, err := time.Parse("2006-01-02", result["created_at"].(string))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "dommage")
+		// Assurez-vous que c'est bien un type time.Time
+		if parsedTime, ok := v.(time.Time); ok {
+			newUser.CreatedAt = parsedTime
+		} else {
+			fmt.Fprintln(os.Stderr, "Erreur : created_at n'est pas un time.Time")
 		}
-		newUser.CreatedAt = parsedTime
 	}
 
 	return newUser, nil

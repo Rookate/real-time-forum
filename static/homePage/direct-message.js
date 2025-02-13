@@ -28,6 +28,7 @@ ws.onmessage = function (event) {
         displaySingleMessage(data);
 
     } else if (data.type === "messages") {
+        console.log("data", data)
         displayMessage(data);
     } else if (data.type === "typing") {
         const typingSpan = document.getElementById('typing-span')
@@ -76,6 +77,8 @@ function conversation(obj) {
 
 function displayMessage(data) {
     divContainer.innerHTML = '';
+
+    console.log("data", data)
 
     data.messages.forEach(messageData => {
         const chat = document.createElement('div');
@@ -148,6 +151,8 @@ function displayContentMessage(content) {
 }
 
 function displayHeader(content) {
+    console.log("object header", content)
+    console.log("object header", content.receiver_username)
     const header = document.createElement('header');
 
     const image = document.createElement('img');
@@ -207,17 +212,13 @@ async function displayConversationHandler() {
 
     // list conversation
     conversationsList.innerHTML = ""; // Nettoyer avant d'ajouter les nouvelles conversations
+    displayAllConversations(conv)
 
-    if (conv.length > 1) {
-        console.log("conv", conv)
-        displayAllConversations(conv)
-    } else {
-        const convItem = displayConversation(conv)
-        conversationsList.appendChild(convItem)
-    }
 }
 
 function displayConversation(content) {
+    console.log('content ahah', content.receiver)
+    console.log("prout", content)
     // Conversation Item
     const conversationItem = document.createElement('div');
     conversationItem.classList.add('conversation-item')

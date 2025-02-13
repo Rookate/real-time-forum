@@ -108,6 +108,8 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 			clients[conn].conversationUUID = conversationUUID
 			mutex.Unlock()
 
+			fmt.Println("COnversation ID :", conversationUUID)
+
 			messages, err := message.GetMessagesByConversations(server.Db, r, conversationUUID)
 			if err != nil {
 				fmt.Println("Error fetching messages:", err)

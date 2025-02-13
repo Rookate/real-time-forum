@@ -120,7 +120,6 @@ func GetSingleMessageByConversations(db *sql.DB, r *http.Request, conversationUU
 
 		singleMessage = append(singleMessage, message)
 
-		fmt.Println("Single message back", singleMessage)
 	}
 
 	return singleMessage, nil
