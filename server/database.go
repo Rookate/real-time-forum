@@ -48,23 +48,90 @@ func init() {
 	if err != nil {
 		log.Fatalf("Impossible de se connecter à la base de données après %d tentatives : %v", maxRetries, err)
 	}
+	// migrateUsersTable(Db)
 	createTables(Db)
 
 	log.Println("Connexion à la base de données réussie")
+}
+
+func migrateUsersTable(db *sql.DB) {
+	fmt.Println("Démarrage de la migration de la table users...")
+
+	tx, err := db.Begin() // Commencer une transaction
+	if err != nil {
+		log.Fatal("Erreur lors du démarrage de la transaction:", err)
+	}
+
+	// Étape 1 : Renommer l'ancienne table
+	_, err = tx.Exec("ALTER TABLE users RENAME TO old_users;")
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Erreur lors du renommage de la table users:", err)
+	}
+
+	// Étape 2 : Créer la nouvelle table avec la bonne structure
+	createUsersTable := `
+    CREATE TABLE users (
+        user_uuid TEXT PRIMARY KEY,
+        username TEXT NOT NULL,
+        first_name,
+        last_name,
+        age INTEGER CHECK (age >= 0 AND age <= 150),
+        gender TEXT CHECK (gender IN ('male', 'female', 'other')),
+        email TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        role TEXT DEFAULT 'user',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        profile_picture TEXT
+    );`
+	_, err = tx.Exec(createUsersTable)
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Erreur lors de la création de la nouvelle table users:", err)
+	}
+
+	// Étape 3 : Copier les données de l'ancienne table vers la nouvelle
+	_, err = tx.Exec(`
+        INSERT INTO users (user_uuid, username, email, password, role, created_at, profile_picture)
+        SELECT user_uuid, username, email, password, role, created_at, profile_picture FROM old_users;
+    `)
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Erreur lors de la copie des données:", err)
+	}
+
+	// Étape 4 : Supprimer l'ancienne table
+	_, err = tx.Exec("DROP TABLE old_users;")
+	if err != nil {
+		tx.Rollback()
+		log.Fatal("Erreur lors de la suppression de l'ancienne table:", err)
+	}
+
+	// Commit la transaction si tout est OK
+	err = tx.Commit()
+	if err != nil {
+		log.Fatal("Erreur lors du commit de la transaction:", err)
+	}
+
+	fmt.Println("Migration de la table users terminée avec succès ! ✅")
 }
 
 func createTables(db *sql.DB) {
 	// Requête pour créer la table users
 	createUsersTable := `
     CREATE TABLE IF NOT EXISTS users (
-        user_uuid TEXT PRIMARY KEY,
-        username TEXT,
-        email TEXT,
-        password TEXT,
-        role TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        profil_picture TEXT
-    );`
+    user_uuid TEXT PRIMARY KEY,
+    username TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    age INTEGER CHECK (age >= 0 AND age <= 150), -- Vérification pour éviter des âges invalides
+    gender TEXT CHECK (gender IN ('male', 'female', 'other')), -- Contraindre aux valeurs autorisées
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'user',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    profile_picture TEXT
+	);`
 
 	// Requête pour créer la table posts
 	createPostsTable := `

@@ -22,7 +22,7 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 	user2, _ := params["user_uuid"].(string)
 	sender, _ := authentification.GetUserFromCookie(r)
 	receiver := user2
-	var receiverPicture, receiverUsername string
+	var receiverPicture, receiverUsername, conversationID string
 
 	// Vérifier si une conversation existe déjà entre les deux utilisateurs
 	existingConversation := `
@@ -40,7 +40,6 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 	    (c.sender = ? AND c.reciever = ?);
 	`
 
-	var conversationID string
 	err := db.QueryRow(existingConversation, sender, receiver, sender, receiver).Scan(&conversationID, &receiverPicture, &receiverUsername)
 	if err == nil {
 		// Une conversation existe déjà, la retourner sans en créer une nouvelle
@@ -86,4 +85,49 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 	}
 
 	return newConversation, nil
+}
+
+func GetConversations(db *sql.DB, user_uuid string) ([]Conversation, error) {
+	getConversations := `
+	SELECT 
+    c.conversation_uuid, 
+    c.created_at,
+    CASE 
+        WHEN c.sender = ? THEN u2.user_uuid
+        ELSE u1.user_uuid
+    END AS receiver_uuid,
+    CASE 
+        WHEN c.sender = ? THEN u2.profile_picture
+        ELSE u1.profile_picture
+    END AS receiver_profile_picture,
+    CASE 
+        WHEN c.sender = ? THEN u2.username
+        ELSE u1.username
+    END AS receiver_username
+FROM 
+    conversations c
+JOIN users u1 ON u1.user_uuid = c.sender
+JOIN users u2 ON u2.user_uuid = c.reciever
+WHERE 
+    c.sender = ? OR c.reciever = ?;
+	`
+
+	rows, err := db.Query(getConversations, user_uuid, user_uuid, user_uuid, user_uuid, user_uuid)
+	if err != nil {
+		return nil, fmt.Errorf("erreur lors de la récupération des conversations: %v", err)
+	}
+	defer rows.Close()
+
+	var conversations []Conversation
+	for rows.Next() {
+		var conversation Conversation
+		err := rows.Scan(&conversation.ConversationID, &conversation.CreatedAt, &conversation.User2ID, &conversation.ReceiverPicture, &conversation.ReceiverUsername)
+		if err != nil {
+			return nil, fmt.Errorf("erreur lors du scan des conversations: %v", err)
+		}
+		conversations = append(conversations, conversation)
+		fmt.Println(conversations)
+	}
+
+	return conversations, nil
 }

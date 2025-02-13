@@ -4,6 +4,7 @@ import { updateURL } from "./utils.js";
 import { fetchMessages } from "./api/fetchMessages.js";
 import { sendMessage } from "./api/createMessage.js";
 import { isTipping } from "./api/isTipping.js";
+import { fetchAllConversations } from "./api/fetchAllConversations.js";
 
 
 export let ws;
@@ -189,12 +190,40 @@ function displayInput(content) {
 
 // Appel de la fonction conversation avec les données
 // conversation(conversationData);
+const conversationsList = document.getElementById("conversation-container"); // Conteneur principal
 
+
+function displayAllConversations(conversations) {
+
+    conversations.forEach(content => {
+        console.log('ici')
+        const convItem = displayConversation(content);
+        conversationsList.appendChild(convItem)
+    });
+}
+
+async function displayConversationHandler() {
+    const conv = await fetchAllConversations();
+
+    // list conversation
+    conversationsList.innerHTML = ""; // Nettoyer avant d'ajouter les nouvelles conversations
+
+    if (conv.length > 1) {
+        console.log("conv", conv)
+        displayAllConversations(conv)
+    } else {
+        const convItem = displayConversation(conv)
+        conversationsList.appendChild(convItem)
+    }
+}
 
 function displayConversation(content) {
     // Conversation Item
     const conversationItem = document.createElement('div');
     conversationItem.classList.add('conversation-item')
+    conversationItem.addEventListener('click', () => {
+        showConversation(content.receiver)
+    })
 
     // Profile Picture
     const imageContainer = document.createElement('div');
@@ -203,19 +232,19 @@ function displayConversation(content) {
 
     const image = document.createElement('img');
     image.classList.add('pp-discord')
-    image.src = content.profile_picture;
-    image.alt = content.username;
+    image.src = content.receiver_profile_picture || "https://koreus.cdn.li/media/201404/90-insolite-34.jpg";
+    image.alt = content.receiver_username;
 
     //Username
     const username = document.createElement('span');
-    username.textContent = content.username;
+    username.textContent = content.receiver_username;
 
     //Append all element
     imageContainer.appendChild(image);
     conversationItem.appendChild(imageContainer);
     conversationItem.appendChild(username);
 
-    return conversationItem;
+    return conversationItem
 }
 
 function createFriendList(friends) {
@@ -269,8 +298,11 @@ export async function showFriendsList() {
     container.innerHTML = "";
     sidebar.classList.add('close');
 
+    displayConversationHandler()
+
     const users = await fetchAllUsers()
-    const friendsList = createFriendList(users)
+    const sortedUser = users.sort((a, b) => a.username.localeCompare(b.username));
+    const friendsList = createFriendList(sortedUser)
     container.appendChild(friendsList)
 }
 

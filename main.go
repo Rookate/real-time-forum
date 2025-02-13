@@ -52,6 +52,7 @@ func main() {
 	mux.HandleFunc("/api/message/createMessage", apiMessages.CreateMessage)
 	mux.HandleFunc("/api/message/getMessage", apiMessages.GetMessageByConversation)
 	mux.HandleFunc("/api/conversations/createConversation", apiConversations.CreateConversation)
+	mux.HandleFunc("/api/conversations/getConversation", apiConversations.GetConversation)
 	// ----------------------------------------------------------------
 
 	mux.HandleFunc("/api/post/createPost", post.CreatePostHandler)
