@@ -1,11 +1,10 @@
 import { UserInfo } from "../app.js";
-import { typingTimeout, ws } from "../direct-message.js";
+import { ws } from "../direct-message.js";
+import { typingTimeout } from "./isTipping.js";
 
 export async function sendMessage(conversationUUID) {
     let input = document.getElementById("messageInput");
     let message = input.value;
-
-    console.log(conversationUUID)
 
     const data = {
         content: message,
@@ -14,8 +13,6 @@ export async function sendMessage(conversationUUID) {
         sender_username: UserInfo.username,
         sender_profile_picture: UserInfo.profile_picture,
     }
-
-    console.log("data à envoyer", data)
 
     if (message !== "") {
         ws.send(JSON.stringify({ type: "single_message", content: data }));
@@ -31,11 +28,8 @@ export async function sendMessage(conversationUUID) {
 
             if (response.ok) {
                 const responseData = await response.json();
-                console.log("Message et data sent", responseData);
                 // Récupérer le message_uuid
                 const messageUUID = responseData.message_uuid;
-                console.log("Message UUID:", messageUUID);
-
                 input.value = "";
                 return messageUUID; // Retourne l'UUID du message si besoin
             } else {

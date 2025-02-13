@@ -3,10 +3,10 @@ import { createConversation } from "./api/createConversation.js";
 import { updateURL } from "./utils.js";
 import { fetchMessages } from "./api/fetchMessages.js";
 import { sendMessage } from "./api/createMessage.js";
+import { isTipping } from "./api/isTipping.js";
 
 
 export let ws;
-export let typingTimeout;
 
 // Container
 const container = document.querySelector('.chat[data-section="private-message"]');
@@ -24,16 +24,21 @@ ws.onopen = function () {
 }
 ws.onmessage = function (event) {
     const data = JSON.parse(event.data);
+
+    console.log("DataType", data.type)
     if (data.type === "single_message") {
         console.log("data", data)
         displaySingleMessage(data);
 
     } else if (data.type === "messages") {
         displayMessage(data);
+    } else if (data.type === "typing") {
+        document.getElementById("typing-span").style.visibility = "visible"
     }
 };
 
 function conversation(obj) {
+    console.log("ui", obj)
     const conversationUUID = obj.conversation_uuid;
     //  console.log("Conversation", conversationUUID)
     updateURL(conversationUUID)
@@ -46,21 +51,27 @@ function conversation(obj) {
     // Display the conversation messages
     fetchMessages(conversationUUID);
 
-    if (!obj.messages || obj.messages.length === 0) {
-        const noMessage = document.createElement('span');
-        noMessage.classList.add('no-msg-content')
-        noMessage.textContent = "Start a new conversation with @Rokat"
+    // Message container
+    container.appendChild(divContainer)
 
-        divContainer.appendChild(noMessage)
-        container.appendChild(divContainer);
-    } else {
-        displayMessage(obj.messages);
-    }
 
     // Display the input area
     const input = displayInput(obj);
-    console.log(obj);
     container.appendChild(input);
+
+    const isTypingSpan = document.createElement('span');
+    isTypingSpan.classList.add('typing-span');
+    isTypingSpan.id = 'typing-span'
+    isTypingSpan.innerHTML = `
+    <span class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+    </span> 
+    ${obj.receiver_username} is typing...
+`;
+
+    container.appendChild(isTypingSpan);
 }
 
 function displayMessage(data) {
@@ -106,8 +117,7 @@ function displayContentMessage(content) {
     const image = document.createElement('img');
     image.classList.add('pp-discord');
     image.src = content.sender_profile_picture;
-    image.alt = content.sender_username
-        ;
+    image.alt = content.sender_username;
 
     // User message container
     const userMessageContainer = document.createElement('div');
@@ -119,8 +129,7 @@ function displayContentMessage(content) {
 
     const username = document.createElement('span');
     username.classList.add('username');
-    username.textContent = content.sender_username
-        ;
+    username.textContent = content.sender_username;
 
     const timestamp = document.createElement('span');
     timestamp.classList.add('timestamp');
@@ -142,11 +151,12 @@ function displayContentMessage(content) {
 }
 
 function displayHeader(content) {
+    console.log("header", content)
     const header = document.createElement('header');
 
     const image = document.createElement('img');
     image.classList.add('pp-header-discord');
-    image.src = content.profile_picture || "https://upload.wikimedia.org/wikipedia/commons/8/87/Chimpanzee-Head.jpg?uselang=fr";
+    image.src = content.receiver_profile_picture || "https://upload.wikimedia.org/wikipedia/commons/8/87/Chimpanzee-Head.jpg?uselang=fr";
     image.alt = content.receiver_username;
 
     const username = document.createElement('span');
@@ -172,7 +182,7 @@ function displayInput(content) {
             sendMessage(content.conversation_uuid, content.reciever, content.sender, content.sender_username, content.sen);
         }
     })
-
+    input.addEventListener("input", isTipping);
     const sendButton = document.createElement('button');
     sendButton.id = "send-chat";
     sendButton.textContent = "Send";
