@@ -41,10 +41,9 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 	`
 
 	var conversationID string
-	err := db.QueryRow(existingConversation, sender, receiver, receiver, sender).Scan(&conversationID, &receiverPicture, &receiverUsername)
+	err := db.QueryRow(existingConversation, sender, receiver, sender, receiver).Scan(&conversationID, &receiverPicture, &receiverUsername)
 	if err == nil {
 		// Une conversation existe déjà, la retourner sans en créer une nouvelle
-		fmt.Println("Conversation déjà existante !")
 		return &Conversation{
 			ConversationID:   conversationID,
 			User1ID:          sender,
@@ -86,6 +85,5 @@ func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface
 		ReceiverPicture:  receiverPicture,
 	}
 
-	fmt.Println("Conversation créée avec succès")
 	return newConversation, nil
 }

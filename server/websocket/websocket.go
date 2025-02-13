@@ -63,7 +63,6 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		messageType, _ := request["type"].(string)
-		fmt.Printf("type de message : %s", messageType)
 
 		switch messageType {
 		case "single_message":
@@ -124,9 +123,10 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 			conn.WriteMessage(websocket.TextMessage, response)
 
 		case "typing":
+			typing, _ := request["isTyping"].(bool)
 			response, _ := json.Marshal(map[string]interface{}{
 				"type":     "typing",
-				"isTyping": true,
+				"isTyping": typing,
 			})
 
 			sender := client

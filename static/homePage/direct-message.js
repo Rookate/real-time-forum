@@ -19,28 +19,27 @@ divContainer.classList.add("message-container-div");
 
 ws = new WebSocket("ws://localhost:8080/ws");
 ws.onopen = function () {
-    console.log("----------------------------------------------------------------")
     fetchMessages();
 }
 ws.onmessage = function (event) {
     const data = JSON.parse(event.data);
-
-    console.log("DataType", data.type)
     if (data.type === "single_message") {
-        console.log("data", data)
         displaySingleMessage(data);
 
     } else if (data.type === "messages") {
         displayMessage(data);
     } else if (data.type === "typing") {
-        document.getElementById("typing-span").style.visibility = "visible"
+        const typingSpan = document.getElementById('typing-span')
+        if (data.isTyping) {
+            typingSpan.style.visibility = "visible"
+        } else {
+            typingSpan.style.visibility = "hidden"
+        }
     }
 };
 
 function conversation(obj) {
-    console.log("ui", obj)
     const conversationUUID = obj.conversation_uuid;
-    //  console.log("Conversation", conversationUUID)
     updateURL(conversationUUID)
 
     container.innerHTML = '';
@@ -91,8 +90,6 @@ function displayMessage(data) {
 }
 
 function displaySingleMessage(message) {
-    // console.log("ça", message);
-
     const chat = document.createElement('div');
     chat.classList.add('message');
 
@@ -105,7 +102,6 @@ function displaySingleMessage(message) {
 }
 
 function displayContentMessage(content) {
-    // console.log("çOOOOOOOOa", content);
 
     const userMessage = document.createElement('div');
     userMessage.classList.add('user-message');
@@ -151,7 +147,6 @@ function displayContentMessage(content) {
 }
 
 function displayHeader(content) {
-    console.log("header", content)
     const header = document.createElement('header');
 
     const image = document.createElement('img');
@@ -169,7 +164,6 @@ function displayHeader(content) {
 }
 
 function displayInput(content) {
-    console.log("display", content);
     const inputUser = document.createElement('div');
     inputUser.classList.add('input-user');
 
@@ -243,7 +237,9 @@ function createFriendList(friends) {
     // Create friends list
     friends.forEach(friend => {
         const friendDiv = document.createElement('div');
-        friendDiv.addEventListener('click', () => showConversation(friend.user_uuid))
+        friendDiv.addEventListener('click', () => {
+            showConversation(friend.user_uuid)
+        })
         friendDiv.classList.add('friend');
 
         const profilePic = document.createElement('img');
@@ -264,7 +260,6 @@ function createFriendList(friends) {
 async function showConversation(user_uuid) {
     container.innerHTML = "";
     const conv = await createConversation(user_uuid);
-    console.log("cc", conv);
     if (conv) {
         conversation(conv);
     }
