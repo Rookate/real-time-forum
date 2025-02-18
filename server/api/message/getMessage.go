@@ -21,11 +21,14 @@ func GetMessageByConversation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	conversation_uuid, ok := params["conversation_uuid"].(string)
+	offset, _ := params["offset"].(int)
+	limit, _ := params["limit"].(int)
+
 	if !ok || conversation_uuid == "" {
 		http.Error(w, "Missing or invalid conversation_uuid", http.StatusBadRequest)
 		return
 	}
-	conversationUUIDdata, err := message.GetMessagesByConversations(server.Db, r, conversation_uuid)
+	conversationUUIDdata, err := message.GetMessagesByConversations(server.Db, r, conversation_uuid, offset, limit)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

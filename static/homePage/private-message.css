@@ -299,3 +299,17 @@
         opacity: 0.3;
     }
 }
+
+.image-wrapper {
+    position: relative;
+}
+
+.online {
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    background-color: green;
+    border-radius: 50%;
+    bottom: 6px;
+    right: 0px;
+}

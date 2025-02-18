@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"forum/server"
+	authentification "forum/server/api/login"
 	"forum/server/message"
 	"net/http"
 	"sync"
@@ -16,6 +17,7 @@ import (
 type Client struct {
 	conn             *websocket.Conn
 	conversationUUID string
+	user_UUID        string
 }
 
 var upgrader = websocket.Upgrader{
@@ -41,11 +43,18 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	client := &Client{
 		conn:             conn,
 		conversationUUID: "",
+		user_UUID:        "",
 	}
 
 	mutex.Lock()
 	clients[conn] = client
+	user_uuid, err := authentification.GetUserFromCookie(r)
+	if err == nil {
+		client.user_UUID = user_uuid
+	}
+	clients[conn].user_UUID = user_uuid
 	mutex.Unlock()
+	broadcastActiveUsers()
 
 	for {
 		_, msg, err := conn.ReadMessage()
@@ -103,14 +112,21 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 
+			offset, _ := request["offset"].(float64)
+			// if (offsetOk) {
+
+			// }
+			limit, _ := request["limit"].(float64)
+			//if (limitOk) {}
+
 			// Mettre à jour l'UUID de la conversation pour ce client
 			mutex.Lock()
 			clients[conn].conversationUUID = conversationUUID
 			mutex.Unlock()
 
-			fmt.Println("COnversation ID :", conversationUUID)
+			// log.Printf("Data pour recevoir les messages : conversation : %s, offset :%f, limit : %f", conversationUUID, offset, limit)
 
-			messages, err := message.GetMessagesByConversations(server.Db, r, conversationUUID)
+			messages, err := message.GetMessagesByConversations(server.Db, r, conversationUUID, int(offset), int(limit))
 			if err != nil {
 				fmt.Println("Error fetching messages:", err)
 				continue
@@ -118,6 +134,34 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 
 			response, _ := json.Marshal(map[string]interface{}{
 				"type":     "messages",
+				"messages": messages,
+			})
+
+			// Envoyer uniquement au client qui a demandé les messages
+			conn.WriteMessage(websocket.TextMessage, response)
+		case "getMoreMessages":
+			conversationUUID, ok := request["conversation_uuid"].(string)
+			if !ok || conversationUUID == "" {
+				fmt.Println("Invalid conversation_uuid")
+				continue
+			}
+
+			offset, _ := request["offset"].(float64)
+			limit, _ := request["limit"].(float64)
+			mutex.Lock()
+			clients[conn].conversationUUID = conversationUUID
+			mutex.Unlock()
+
+			messages, err := message.GetMessagesByConversations(server.Db, r, conversationUUID, int(offset), int(limit))
+			if err != nil {
+				fmt.Println("Error fetching messages:", err)
+				continue
+			}
+
+			// log.Printf("Data pour recevoir PLUS de messages : conversation : %s, offset :%f, limit : %f", conversationUUID, offset, limit)
+
+			response, _ := json.Marshal(map[string]interface{}{
+				"type":     "moreMessages",
 				"messages": messages,
 			})
 
@@ -142,8 +186,26 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 			}
-		}
+		case "notification":
+			fmt.Println("Notification")
+			response, _ := json.Marshal(map[string]interface{}{
+				"type": "notification",
+			})
 
+			// On envoi a l'autre utilisateur
+			sender := client
+
+			for _, client := range clients {
+				if client != sender {
+					err := client.conn.WriteMessage(websocket.TextMessage, response)
+					if err != nil {
+						client.conn.Close()
+						delete(clients, client.conn)
+					}
+				}
+
+			}
+		}
 	}
 }
 
@@ -159,5 +221,31 @@ func HandleMessages() {
 			}
 		}
 		mutex.Unlock()
+	}
+}
+
+func broadcastActiveUsers() {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	var activeUsers []string
+	for _, client := range clients {
+		if client.user_UUID != "" {
+			activeUsers = append(activeUsers, client.user_UUID)
+		}
+	}
+
+	response, _ := json.Marshal(map[string]interface{}{
+		"type":         "active_users",
+		"active_users": activeUsers,
+	})
+
+	// Envoyer la liste des utilisateurs à tous les clients connectés
+	for _, client := range clients {
+		err := client.conn.WriteMessage(websocket.TextMessage, response)
+		if err != nil {
+			client.conn.Close()
+			delete(clients, client.conn)
+		}
 	}
 }

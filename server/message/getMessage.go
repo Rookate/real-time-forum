@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func GetMessagesByConversations(db *sql.DB, r *http.Request, conversationUUID string) ([]Message, error) {
+func GetMessagesByConversations(db *sql.DB, r *http.Request, conversationUUID string, offset int, limit int) ([]Message, error) {
 	getMessagesByConversationsQuery := `
 	SELECT 
 		m.message_uuid, 
@@ -25,10 +25,11 @@ func GetMessagesByConversations(db *sql.DB, r *http.Request, conversationUUID st
 		LEFT JOIN users sender ON m.sender_uuid = sender.user_uuid
 		LEFT JOIN users receiver ON m.receiver_uuid = receiver.user_uuid
 		WHERE m.conversation_uuid = ?
-		ORDER BY m.created_at ASC;
+		ORDER BY m.created_at DESC
+		LIMIT ?
+		OFFSET ?;
 	`
-
-	rows, err := server.RunQuery(getMessagesByConversationsQuery, conversationUUID)
+	rows, err := server.RunQuery(getMessagesByConversationsQuery, conversationUUID, limit, offset)
 	if err != nil {
 		return nil, fmt.Errorf("erreur lors de la récupération des messages par conversation: %v", err)
 	}

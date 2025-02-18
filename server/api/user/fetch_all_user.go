@@ -3,6 +3,7 @@ package user
 import (
 	"encoding/json"
 	"forum/server"
+	"log"
 	"net/http"
 )
 
@@ -20,5 +21,8 @@ func FetchAllUsersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(userData)
+	err = json.NewEncoder(w).Encode(userData)
+	if err != nil {
+		log.Printf("Error encoding response: %v", err)
+	}
 }

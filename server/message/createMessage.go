@@ -6,6 +6,7 @@ import (
 	"forum/server"
 	authentification "forum/server/api/login"
 	posts "forum/server/utils"
+	"log"
 	"net/http"
 	"time"
 )
@@ -48,7 +49,14 @@ func CreateMessage(db *sql.DB, r *http.Request, params map[string]interface{}) (
 	createMessageQuery := `INSERT INTO messages (message_uuid, conversation_uuid, sender_uuid, receiver_uuid, content, created_at, is_deleted) VALUES (?, ?, ?, ?, ?, ?, ?)`
 	_, err = server.RunQuery(createMessageQuery, message_uuid, conversation_uuid, sender_uuid, receiver_uuid, content, creationDate, is_deleted)
 	if err != nil {
-		return nil, fmt.Errorf("erreur lors de la création du post: %v", err)
+		return nil, fmt.Errorf("erreur lors de la création du message: %v", err)
+	}
+
+	updateConversation := `UPDATE conversations SET updated_at = CURRENT_TIMESTAMP WHERE conversation_uuid = ?`
+	_, err = db.Exec(updateConversation, conversation_uuid)
+	if err != nil {
+		log.Println("Error updating conversation:", err)
+		return nil, fmt.Errorf("erreur lors de l'update de conv timestamp : %v", err)
 	}
 
 	newMessage := &Message{

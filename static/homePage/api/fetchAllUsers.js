@@ -8,7 +8,8 @@ export async function fetchAllUsers() {
         });
 
         if (response.ok) {
-            return await response.json()
+            const data = await response.json()
+            return data
         } else {
             const error = await response.json();
             alert("Erreur lors de la récupération des users " + error.message);

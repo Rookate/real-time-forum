@@ -32,7 +32,6 @@ export async function fetchUserInfo() {
 
         const data = await response.json();
         UserInfo = data;
-        console.log("User info fetched", UserInfo);
 
     } catch (error) {
         console.error(error);
@@ -115,9 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
+    const logOut = document.getElementById('logout-button');
 
     // Vérifiez si les informations utilisateur sont valides
     if (UserInfo) {
+        logOut.style.display = "flex"
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile-container');
@@ -136,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         logoutButton.id = "logout-btn";
         logoutButton.textContent = 'Log Out';
         logoutButton.addEventListener('click', handleLogout);
+        logOut.addEventListener('click', handleLogout)
 
         menu.appendChild(logoutButton);
 
@@ -181,6 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Si le bouton "Login" n'est pas déjà dans le menu
     if (!profilMenu.contains(loginButton)) {
+        logOut.style.display = 'none';
         // Créer un nouveau bouton "Login" si nécessaire
         const newLoginButton = document.createElement('button');
         newLoginButton.id = 'login-btn';

@@ -885,7 +885,22 @@ body {
 #notification-dot {
     position: absolute;
     top: 30%;
-    left: 13%;
+    margin-left: 13px;
+    width: 12px;
+    height: 12px;
+    background-color: var(--primary-color);
+    border-radius: 50%;
+    display: none;
+}
+
+#private-message-link>div {
+    position: relative;
+}
+
+#private-message-dot {
+    position: absolute;
+    top: 0%;
+    margin-left: 15px;
     width: 12px;
     height: 12px;
     background-color: var(--primary-color);
@@ -1089,4 +1104,26 @@ ul {
     align-self: flex-start;
     width: 100%;
     font-size: 14px;
+}
+
+#logout-button {
+    display: none;
+    align-items: center;
+    border-radius: .5em;
+    padding: .85em;
+    gap: 1em;
+    margin-top: auto;
+    cursor: pointer;
+}
+
+#logout-button:hover {
+    background-color: var(--hover-color);
+
+    >span {
+        color: var(--error-color);
+    }
+
+    >svg {
+        fill: var(--error-color);
+    }
 }

@@ -16,6 +16,7 @@ export async function sendMessage(conversationUUID) {
 
     if (message !== "") {
         ws.send(JSON.stringify({ type: "single_message", content: data }));
+        ws.send(JSON.stringify({ type: "notification" }));
 
         try {
             const response = await fetch("http://localhost:8080/api/message/createMessage", {

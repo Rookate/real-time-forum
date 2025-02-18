@@ -126,3 +126,39 @@ export function updateURL(conversationUUID) {
     const newURL = `/conversation/${conversationUUID}`;
     window.history.pushState({}, "", newURL);
 }
+
+
+export function throttle(callback, limit) {
+    let waiting = false;
+    return function (...args) {
+        if (!waiting) {
+            callback.apply(this, args);
+            waiting = true;
+            setTimeout(() => (waiting = false), limit);
+        }
+    };
+}
+
+export function formatTimestamp(isoString) {
+    const date = new Date(isoString);
+
+    // Vérifie si la date est invalide
+    if (isNaN(date.getTime())) {
+        return isoString;  // Renvoie l'ISO string si la date est invalide
+    }
+
+    const options = {
+        weekday: "short",   // Tue
+        day: "2-digit",     // 18
+        month: "short",     // Feb
+        year: "numeric",    // 2025
+        hour: "2-digit",    // 16
+        minute: "2-digit",  // 15
+        second: "2-digit",  // 12
+        timeZoneName: "short", // CET
+    };
+
+    // Sinon, formate la date
+    return date.toLocaleString("en-GB", options);
+
+}

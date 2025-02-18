@@ -13,10 +13,9 @@ export async function fetchAllConversations() {
             return data
         } else {
             const error = await response.json();
-            alert("Erreur lors de la récupération des users " + error.message);
+            console.error("Erreur lors de la récupération des users " + error.message);
         }
     } catch (error) {
         console.error("Erreur lors de l'envoi du commentaire:", error);
-        alert("Une erreur s'est produite lors de l'envoi du commentaire. Veuillez réessayer.");
     }
 }

@@ -16,6 +16,7 @@ type Conversation struct {
 	ReceiverUsername string    `json:"receiver_username"`
 	ReceiverPicture  string    `json:"receiver_profile_picture"`
 	CreatedAt        time.Time `json:"created_at"`
+	UpdateAt         time.Time `json:"update_at"`
 }
 
 func CreateConversation(db *sql.DB, r *http.Request, params map[string]interface{}) (*Conversation, error) {
@@ -100,6 +101,7 @@ func GetConversations(db *sql.DB, user_uuid string) ([]Conversation, error) {
     SELECT 
         c.conversation_uuid, 
         c.created_at,
+		c.updated_at,
         CASE 
             WHEN c.sender = ? THEN c.reciever
             ELSE c.sender
@@ -132,6 +134,7 @@ func GetConversations(db *sql.DB, user_uuid string) ([]Conversation, error) {
 		err := rows.Scan(
 			&conversation.ConversationID,
 			&conversation.CreatedAt,
+			&conversation.UpdateAt,
 			&conversation.User2ID,
 			&conversation.ReceiverPicture,
 			&conversation.ReceiverUsername,

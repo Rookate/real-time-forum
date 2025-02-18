@@ -189,10 +189,10 @@ func createTables(db *sql.DB) {
   sender TEXT,
   reciever TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (sender) REFERENCES users(user_uuid),
   FOREIGN KEY (reciever) REFERENCES users(user_uuid)
-);
-`
+);`
 
 	createMessagesTable := `
   CREATE TABLE IF NOT EXISTS messages (

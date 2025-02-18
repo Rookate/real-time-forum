@@ -1,6 +1,6 @@
 import { fetchAllUsers } from "./api/fetchAllUsers.js";
 import { createConversation } from "./api/createConversation.js";
-import { updateURL } from "./utils.js";
+import { formatTimestamp, throttle, updateURL } from "./utils.js";
 import { fetchMessages } from "./api/fetchMessages.js";
 import { sendMessage } from "./api/createMessage.js";
 import { isTipping } from "./api/isTipping.js";
@@ -8,7 +8,9 @@ import { fetchAllConversations } from "./api/fetchAllConversations.js";
 
 
 export let ws;
-
+let convId
+let activeUser
+let currentIndexMessages = 0
 // Container
 const container = document.querySelector('.chat[data-section="private-message"]');
 const sidebar = document.getElementById('sidebar');
@@ -20,15 +22,21 @@ divContainer.classList.add("message-container-div");
 
 ws = new WebSocket("ws://localhost:8080/ws");
 ws.onopen = function () {
-    fetchMessages();
+    console.log('Open')
 }
 ws.onmessage = function (event) {
     const data = JSON.parse(event.data);
+    console.log('data recu', data)
+
     if (data.type === "single_message") {
         displaySingleMessage(data);
-
-    } else if (data.type === "messages") {
-        console.log("data", data)
+    } else if (data.type === "moreMessages") {
+        displayMessage(data, true)
+    } else if (data.type === "notification") {
+        const messageDot = document.getElementById('private-message-dot')
+        messageDot.style.display = "block"
+    }
+    else if (data.type === "messages") {
         displayMessage(data);
     } else if (data.type === "typing") {
         const typingSpan = document.getElementById('typing-span')
@@ -37,24 +45,46 @@ ws.onmessage = function (event) {
         } else {
             typingSpan.style.visibility = "hidden"
         }
+    } else if (data.type === "active_users") {
+        activeUser = data.active_users
     }
 };
+
+
+
+
+// const handleScroll = async () => {
+//     if (
+//         !isFetching &&
+//         window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
+//     ) {
+//         isFetching = true;
+//         console.log("OUI")
+//         displayMessage();
+//         isFetching = false;
+//     }
+// };
+
+// const throttleScroll = throttle(handleScroll, 300);
+// window.addEventListener("scroll", throttleScroll);
 
 function conversation(obj) {
     const conversationUUID = obj.conversation_uuid;
     updateURL(conversationUUID)
 
     container.innerHTML = '';
+    divContainer.innerHTML = '';
     // Header
     const header = displayHeader(obj);
     container.appendChild(header);
 
     // Display the conversation messages
-    fetchMessages(conversationUUID);
+    currentIndexMessages = 0
+    currentIndexMessages = fetchMessages(conversationUUID, null, currentIndexMessages);
+    convId = conversationUUID
 
     // Message container
     container.appendChild(divContainer)
-
 
     // Display the input area
     const input = displayInput(obj);
@@ -75,10 +105,9 @@ function conversation(obj) {
     container.appendChild(isTypingSpan);
 }
 
-function displayMessage(data) {
-    divContainer.innerHTML = '';
-
-    console.log("data", data)
+function displayMessage(data, prepend = false) {
+    const scrollPosition = divContainer.scrollTop;
+    const initialScrollHeight = divContainer.scrollHeight;
 
     data.messages.forEach(messageData => {
         const chat = document.createElement('div');
@@ -88,9 +117,18 @@ function displayMessage(data) {
         const messageContent = displayContentMessage(messageData);
         chat.appendChild(messageContent);
 
-        // Append to container
-        divContainer.appendChild(chat);
+        divContainer.prepend(chat);
     });
+
+    if (prepend) {
+        // Maintenir la position relative du scroll lors de l'ajout en haut
+        const newScrollHeight = divContainer.scrollHeight;
+        const scrollDiff = newScrollHeight - initialScrollHeight;
+        divContainer.scrollTop = scrollPosition + scrollDiff;
+    } else {
+        // Scroll tout en bas pour les nouveaux messages
+        divContainer.scrollTop = divContainer.scrollHeight;
+    }
 }
 
 function displaySingleMessage(message) {
@@ -133,7 +171,7 @@ function displayContentMessage(content) {
 
     const timestamp = document.createElement('span');
     timestamp.classList.add('timestamp');
-    timestamp.textContent = content.created_at;
+    timestamp.textContent = formatTimestamp(content.created_at);
 
     const contentMessage = document.createElement('p');
     contentMessage.textContent = content.content;
@@ -151,8 +189,7 @@ function displayContentMessage(content) {
 }
 
 function displayHeader(content) {
-    console.log("object header", content)
-    console.log("object header", content.receiver_username)
+
     const header = document.createElement('header');
 
     const image = document.createElement('img');
@@ -200,8 +237,8 @@ const conversationsList = document.getElementById("conversation-container"); // 
 
 function displayAllConversations(conversations) {
 
-    conversations.forEach(content => {
-        console.log('ici')
+    const sortedConv = conversations.sort((a, b) => b.update_at.localeCompare(a.update_at))
+    sortedConv.forEach(content => {
         const convItem = displayConversation(content);
         conversationsList.appendChild(convItem)
     });
@@ -217,8 +254,6 @@ async function displayConversationHandler() {
 }
 
 function displayConversation(content) {
-    console.log('content ahah', content.receiver)
-    console.log("prout", content)
     // Conversation Item
     const conversationItem = document.createElement('div');
     conversationItem.classList.add('conversation-item')
@@ -248,7 +283,7 @@ function displayConversation(content) {
     return conversationItem
 }
 
-function createFriendList(friends) {
+function createFriendList(friends, clients) {
     const friendsContainer = document.createElement('div');
     friendsContainer.classList.add('friend-list');
 
@@ -272,6 +307,14 @@ function createFriendList(friends) {
         })
         friendDiv.classList.add('friend');
 
+        const imageWrapper = document.createElement('div');
+        imageWrapper.classList.add('image-wrapper');
+        if (clients.includes(friend.user_uuid)) {
+            const online = document.createElement('div');
+            online.classList.add('online');
+            imageWrapper.appendChild(online);
+        }
+
         const profilePic = document.createElement('img');
         profilePic.src = friend.profile_picture || "https://upload.wikimedia.org/wikipedia/commons/8/87/Chimpanzee-Head.jpg?uselang=fr";
         profilePic.classList.add('pp-header-discord');
@@ -279,7 +322,8 @@ function createFriendList(friends) {
         const username = document.createElement('span');
         username.textContent = friend.username;
 
-        friendDiv.appendChild(profilePic);
+        imageWrapper.appendChild(profilePic);
+        friendDiv.appendChild(imageWrapper);
         friendDiv.appendChild(username);
         friendsContainer.appendChild(friendDiv);
     });
@@ -290,6 +334,7 @@ function createFriendList(friends) {
 async function showConversation(user_uuid) {
     container.innerHTML = "";
     const conv = await createConversation(user_uuid);
+    console.log("conv recu", conv)
     if (conv) {
         conversation(conv);
     }
@@ -301,35 +346,40 @@ export async function showFriendsList() {
 
     displayConversationHandler()
 
+    const privateMessageDot = document.getElementById("private-message-dot")
+    privateMessageDot.style.display = "none"
+
     const users = await fetchAllUsers()
     const sortedUser = users.sort((a, b) => a.username.localeCompare(b.username));
-    const friendsList = createFriendList(sortedUser)
+    const friendsList = createFriendList(sortedUser, activeUser)
     container.appendChild(friendsList)
 }
 
-const messages = [
-    {
-        username: "Rokat", // Nom de l'utilisateur
-        profile_picture: "https://example.com/pp-rokat.jpg", // URL de l'image de profil
-        content: "C'est en 1901 dans Psychopathologie de la vie quotidienne que Sigmund Freud détaille le fonctionnement du lapsus.",
-        date: "Wed, 05 February 2025 11:40", // Horodatage du message
-    },
-    {
-        username: "Luna",
-        profile_picture: "https://example.com/pp-luna.jpg",
-        content: "C'est fascinant! Je vais devoir lire ça.",
-        date: "Wed, 05 February 2025 11:45",
+const OFFSET_TRIGGER = 50;
+divContainer.addEventListener("scroll", throttle(async () => {
+    if (divContainer.scrollTop <= OFFSET_TRIGGER) {
+        currentIndexMessages = fetchMessages(convId, true, currentIndexMessages)
     }
-    // Ajoute d'autres messages ici
-];
-
-//
+}, 500))
 
 ws.onclose = function () {
     console.log("WebSocket connection closed, retrying...");
-    setTimeout(connect, 1000); // Reconnect after 1 second
+    setTimeout(connect, 1000);
 };
 
 ws.onerror = function (error) {
     console.error("WebSocket error:", error);
 };
+
+// const privateMessageLink = document.getElementById('private-message-link');
+
+// const moveButton = function () {
+//     const randomX = Math.random() * (window.innerWidth - privateMessageLink.offsetWidth);
+//     const randomY = Math.random() * (window.innerHeight - privateMessageLink.offsetHeight);
+//     privateMessageLink.style.position = 'absolute'
+//     privateMessageLink.style.zIndex = '99999'
+//     privateMessageLink.style.left = randomX + "px";
+//     privateMessageLink.style.top = randomY + "px";
+// };
+// privateMessageLink.addEventListener('mouseenter', moveButton)
+// Object.defineProperty(window, "console", { value: null })
