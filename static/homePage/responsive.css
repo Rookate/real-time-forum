@@ -1,13 +1,9 @@
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 480px) {
 
     #sidebar ul {
         display: flex;
         flex-direction: row;
         width: 100%;
-    }
-
-    .timestamp {
-        display: none;
     }
 
     body {
@@ -33,18 +29,6 @@
 
     }
 
-    .logo-name {
-        display: none;
-    }
-
-    /* Empêcher l'overflow et limiter la taille au max de l'écran */
-    .chat-center {
-        height: calc(100vh - 60px);
-        /* 60px est la hauteur du sidebar */
-        display: flex;
-        justify-content: center;
-    }
-
     #container {
         display: grid;
         grid-template-columns: auto;
@@ -55,6 +39,10 @@
         overflow-x: hidden;
     }
 
+    .chat {
+        height: 95vh !important;
+    }
+
     #users-post {
         height: calc(100vh - 110px);
         /* Ajuster la hauteur pour laisser de l'espace en bas */
@@ -62,6 +50,14 @@
         overflow-y: auto;
         border: none;
         border-radius: 0;
+    }
+
+    .reaction-btn {
+        justify-content: center;
+    }
+
+    #login-btn {
+        width: 60px;
     }
 
     /* Autres règles pour le sidebar */
@@ -78,16 +74,22 @@
         border-top: 1px solid var(--border-color);
         overflow-x: auto;
         scrollbar-width: none;
+        z-index: 99999;
     }
 
     #sidebar>ul>li:first-child {
         display: none;
     }
 
+    /* .timestamp {
+        display: none;
+    } */
+
     #add-button {
         bottom: 70px;
         width: 50px;
         height: 50px;
+        opacity: 0.8;
     }
 
     #dark-mode-toggle {
@@ -102,5 +104,31 @@
 
     .categorie {
         font-size: 24px;
+    }
+
+    #sidebar a span {
+        display: none;
+    }
+
+    .users-post {
+        padding: 0;
+        max-height: 85vh;
+    }
+
+    .message-container {
+        margin: 0;
+        gap: 3px;
+    }
+
+    .message-item {
+        padding: 10px;
+    }
+
+    .message-header {
+        gap: 5px;
+    }
+
+    .message-item .timestamp {
+        display: none;
     }
 }

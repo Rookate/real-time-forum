@@ -124,21 +124,25 @@
                     <h3>Membres</h3>
                     <ul id="user-list"></ul>
                 </div> -->
+
+                <li>
+                    <a id="logout-button">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                            <path
+                                d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
+                        </svg>
+                        <span>Log Out</span>
+                    </a>
+                </li>
             </ul>
-            <div id="logout-button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
-                    <path
-                        d="M377.9 105.9L500.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L377.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1-128 0c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM160 96L96 96c-17.7 0-32 14.3-32 32l0 256c0 17.7 14.3 32 32 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32l-64 0c-53 0-96-43-96-96L0 128C0 75 43 32 96 32l64 0c17.7 0 32 14.3 32 32s-14.3 32-32 32z" />
-                </svg>
-                <span>Log Out</span>
-            </div>
+
         </nav>
         <section id="home-section" class="section">
             <div class="chat-box">
                 <header id="header">
                     <h2 id="title">General</h2>
                     <div class="profil-menu">
-                        <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                        <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                         <button id="login-btn" class="login-btn">Log in</button>
                     </div>
                 </header>
@@ -189,18 +193,21 @@
                 <nav id="conversations-list">
                     <!-- <header>Friends</header> -->
                     <header id="conversation-header">Conversations</header>
+                    <button id="close-friend-list">+</button>
                     <div id="conversation-container">
 
                     </div>
                 </nav>
-                <div class="chat" data-section="private-message">
+                <button id="open-friend-list">+</button>
+
+                <div class="chat" data-section="private-message"></div>
         </section>
 
         <section id="search-section" class="section" style="display: none;">
             <header id="header">
                 <h2 id="title">Search</h2>
                 <div class="profil-menu">
-                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                 </div>
             </header>
 
@@ -218,7 +225,7 @@
             <header id="header">
                 <h2 id="title">Notifications</h2>
                 <div class="profil-menu">
-                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                 </div>
             </header>
 
@@ -236,7 +243,7 @@
             <header id="header">
                 <h2 id="title">Trending</h2>
                 <div class="profil-menu">
-                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                 </div>
             </header>
 
@@ -253,7 +260,7 @@
             <header id="header">
                 <h2 id="title">Request</h2>
                 <div class="profil-menu">
-                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                 </div>
             </header>
 
@@ -274,7 +281,7 @@
             <header id="header">
                 <h2 id="title">Moderation</h2>
                 <div class="profil-menu">
-                    <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button>
+                    <!-- <button id="dark-mode-toggle" class="dark-mode-toggle">Dark Mode</button> -->
                 </div>
             </header>
 
@@ -310,42 +317,3 @@
 </body>
 
 </html>
-
-
-<!-- <div class="friend-list">
-                        <div id="search-friend-div">
-                            <input type="text" id="input-friends-list" placeholder="Search">
-                        </div>
-
-
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                        <div class="friend">
-                            <img src="https://ih1.redbubble.net/image.3546319896.8009/flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
-                                class="pp-header-discord">
-                            <span>Rokat</span>
-                        </div>
-                    </div> -->

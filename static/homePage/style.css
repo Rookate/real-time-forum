@@ -42,6 +42,7 @@ body {
     transition: 300ms ease-in-out;
     overflow: hidden;
     text-wrap: nowrap;
+    z-index: 999999;
 }
 
 #sidebar #user-list-containers h3 {
@@ -76,7 +77,7 @@ body {
 }
 
 #sidebar ul {
-    flex-grow: 0;
+    flex-grow: 1;
     list-style: none;
     text-wrap: nowrap;
 }
@@ -280,6 +281,10 @@ body {
 
 .username {
     font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: clamp(16px, 2vw, 18px);
+    max-width: 100%;
 }
 
 .timestamp {
@@ -288,6 +293,7 @@ body {
 
 .message-header {
     display: flex;
+    align-items: center;
     gap: 12px;
     width: 100%;
     flex: 1;
@@ -382,6 +388,7 @@ body {
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease;
+    z-index: 2;
 }
 
 #add-button:hover,
@@ -1117,13 +1124,13 @@ ul {
 }
 
 #logout-button:hover {
-    background-color: var(--hover-color);
+    background-color: var(--hover-color) !important;
 
     >span {
-        color: var(--error-color);
+        color: var(--error-color) !important;
     }
 
     >svg {
-        fill: var(--error-color);
+        fill: var(--error-color) !important;
     }
 }

@@ -2,6 +2,7 @@ import { ReportMessage } from "./requestHandlers.js";
 import { UserInfo } from "./app.js";
 import { deleteComment, deletePost, updateComment, updatePost } from "./messageAction.js";
 import { promoteUser } from "./role.js";
+import { formatTimestamp } from "./utils.js";
 
 export function DisplayMessages(post, section, isComment = false, isNotif = false) {
     const svgLike = `<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentcolor"><path d="M720-120H280v-520l280-280 50 50q7 7 11.5 19t4.5 23v14l-44 174h258q32 0 56 24t24 56v80q0 7-2 15t-4 15L794-168q-9 20-30 34t-44 14Zm-360-80h360l120-280v-80H480l54-220-174 174v406Zm0-406v406-406Zm-80-34v80H160v360h120v80H80v-520h200Z"/></svg>`
@@ -55,7 +56,7 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
 
     const timeStampSpan = document.createElement('span');
     timeStampSpan.classList.add('timestamp');
-    timeStampSpan.textContent = displayTimeStamp;
+    timeStampSpan.textContent = formatTimestamp(post.created_at);
 
     // Bouton SVG (trois points)
     const menuButton = document.createElement('button');
@@ -163,6 +164,7 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
         menu.appendChild(deleteMenuItem);
     }
 
+    messageHeader.appendChild(profileContainer)
     messageHeader.appendChild(userNameSpan);
     messageHeader.appendChild(roleDiv);
     messageHeader.appendChild(timeStampSpan);
@@ -280,7 +282,6 @@ export function DisplayMessages(post, section, isComment = false, isNotif = fals
     }
 
     messageContainer.appendChild(reactionBtnContainer);
-    messageItem.appendChild(profileContainer);
     messageItem.appendChild(messageContainer);
 
     // Ajout du message dans la liste
@@ -302,7 +303,7 @@ export function toggleMenu(event, post_uuid) {
 
     // Positionner le menu à l'endroit du curseur
     menu.style.top = `${event.clientY}px`;
-    menu.style.left = `${event.clientX}px`;
+    menu.style.left = `${event.clientX - 100}px`;
 
     // Toggle le menu actuel
     menu.style.display = 'block';

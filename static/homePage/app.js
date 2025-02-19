@@ -1,6 +1,6 @@
 import { DisplayMessages } from "./displayMessage.js";
 import { initEventListeners } from "./comment.js";
-import { getPPFromID } from "./utils.js";
+import { getPPFromID, throttle } from "./utils.js";
 import { NewPost } from "./newPost.js";
 import { handleLogout } from "./logout.js";
 import { toggleCommentReaction, toggleReaction } from "./reaction.js";
@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (UserInfo.role !== "admin" && UserInfo.role !== "GOAT") {
             moderationLink.remove();
         }
-        return; // Sortir de la fonction si l'utilisateur est connecté
+        return;
     }
 
     const elementsToHide = [
@@ -176,9 +176,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('private-message-link'),
     ];
 
-    // Remove each element
     elementsToHide.forEach(element => {
-        if (element) element.remove();
+        if (element) {
+            const parentLi = element.closest('li');
+            if (parentLi) parentLi.remove();
+        }
     });
 
     // Si le bouton "Login" n'est pas déjà dans le menu
@@ -196,11 +198,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 
-
-// Événement pour le menu
-toggleButton.addEventListener('click', () => {
+function toggleSidebar() {
     sidebar.classList.toggle('close');
-});
+}
+// Ajouter l'événement
+if (window.screen.width >= 768) {
+    toggleButton.addEventListener('click', toggleSidebar);
+}
+
 
 export async function fetchPosts() {
     const messagesList = document.querySelector(`.users-post[data-section="home"]`);
@@ -283,3 +288,55 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSectionEvents(UserInfo);
     document.getElementById('dashboard-link').addEventListener('click', () => showDashboard(UserInfo));
 });
+
+function handleResize() {
+    const elements = ['request-link', 'moderation-link'];
+
+    if (window.innerWidth <= 480) {
+        for (const section of elements) {
+            const element = document.getElementById(section);
+            if (element) {
+                element.style.display = 'none';
+            }
+        }
+        sidebar.classList.remove('close');
+    } else {
+        for (const section of elements) {
+            const element = document.getElementById(section);
+            if (element) {
+                element.style.display = 'flex';
+            }
+        }
+    }
+}
+
+const friendList = document.getElementById('close-friend-list');
+const convList = document.getElementById('conversations-list');
+const openFriendList = document.getElementById('open-friend-list');
+
+function toggleCloseFriend() {
+    console.log('click')
+    friendList.classList.toggle('close');
+    convList.classList.toggle('close');
+
+
+    if (convList.classList.contains('close')) {
+        // Ajouter un écouteur d'événement pour détecter la fin de la transition
+        convList.addEventListener('transitionend', function onTransitionEnd() {
+            convList.style.display = 'none';
+            openFriendList.style.display = 'block'
+            convList.removeEventListener('transitionend', onTransitionEnd);
+        }, { once: true });
+    } else {
+        convList.style.display = 'flex';
+        openFriendList.style.display = 'none'
+    }
+}
+friendList.addEventListener('click', toggleCloseFriend)
+openFriendList.addEventListener('click', toggleCloseFriend)
+
+
+const throttleResize = throttle(handleResize, 500)
+
+window.addEventListener('resize', throttleResize)
+handleResize();

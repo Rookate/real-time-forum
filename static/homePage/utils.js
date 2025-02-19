@@ -151,11 +151,9 @@ export function formatTimestamp(isoString) {
         weekday: "short",   // Tue
         day: "2-digit",     // 18
         month: "short",     // Feb
-        year: "numeric",    // 2025
+        year: "2-digit",    // 2025
         hour: "2-digit",    // 16
         minute: "2-digit",  // 15
-        second: "2-digit",  // 12
-        timeZoneName: "short", // CET
     };
 
     // Sinon, formate la date

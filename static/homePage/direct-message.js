@@ -49,24 +49,8 @@ ws.onmessage = function (event) {
         activeUser = data.active_users
     }
 };
+const openFriendList = document.getElementById('open-friend-list');
 
-
-
-
-// const handleScroll = async () => {
-//     if (
-//         !isFetching &&
-//         window.innerHeight + window.scrollY >= document.body.offsetHeight - 100
-//     ) {
-//         isFetching = true;
-//         console.log("OUI")
-//         displayMessage();
-//         isFetching = false;
-//     }
-// };
-
-// const throttleScroll = throttle(handleScroll, 300);
-// window.addEventListener("scroll", throttleScroll);
 
 function conversation(obj) {
     const conversationUUID = obj.conversation_uuid;
@@ -342,7 +326,7 @@ async function showConversation(user_uuid) {
 
 export async function showFriendsList() {
     container.innerHTML = "";
-    sidebar.classList.add('close');
+    if (window.screen.width > 768) sidebar.classList.add('close');
 
     displayConversationHandler()
 

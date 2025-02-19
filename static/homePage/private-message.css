@@ -37,6 +37,7 @@
 }
 
 #conversations-list {
+    position: relative;
     padding: 0 30px;
     background-color: var(--dark-color);
     height: 100vh;
@@ -45,6 +46,8 @@
     border-right: 0.5px solid var(--border-color);
     display: flex;
     flex-direction: column;
+    transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .conversation-item {
@@ -61,6 +64,45 @@
 
 .conversation-item:hover {
     background-color: var(--hover-color);
+}
+
+#close-friend-list {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid var(--border-color);
+    background: none;
+    transform: rotate(45deg);
+    transition: 150ms ease-in-out;
+}
+
+#open-friend-list {
+    position: absolute;
+    top: 1em;
+    left: 1em;
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    text-align: center;
+    font-size: 18px;
+    border: 1px solid var(--border-color);
+    background: none;
+    transition: 150ms ease-in-out;
+    display: none;
+}
+
+#close-friend-list.close {
+    transform: rotate(0deg);
+}
+
+#conversations-list.close {
+    opacity: 0;
+    transform: translateX(-100%);
 }
 
 .conversation-item span {
