@@ -14,7 +14,7 @@ export async function fetchAllUsers() {
         clearList(user);
         clearList(goat)
 
-        users.forEach((userData) => {
+        users.userData.forEach((userData) => {
             try {
                 DisplayUsersAdmin(userData);
             } catch (error) {

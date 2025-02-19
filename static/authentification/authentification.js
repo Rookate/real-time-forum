@@ -74,6 +74,11 @@ document.getElementById('submit-register').addEventListener('click', async (even
     }
 
     const username = document.getElementById("new-username").value;
+
+    const firstName = document.getElementById("new-firstname").value;
+    const lastName = document.getElementById("new-lastname").value;
+    const gender = document.getElementById("gender").value;
+    const age = parseInt(document.getElementById("age").value, 10);
     const password = document.getElementById("new-password").value;
     const email = document.getElementById('new-email').value;
     const profileImageSrc = document.getElementById('file-input').src;  // Get the image source from the <img> element
@@ -82,6 +87,10 @@ document.getElementById('submit-register').addEventListener('click', async (even
     const data = {
         username: username,
         password: password,
+        first_name: firstName,
+        last_name: lastName,
+        gender: gender,
+        age: age,
         email: email,
         profile_picture: ""
     };
@@ -169,3 +178,6 @@ document.getElementById('discord-btn').addEventListener('click', () => {
 document.getElementById('google-btn').addEventListener('click', () => {
     window.location.href = '/api/google_login';
 });
+
+
+// age gender first name last name

@@ -57,20 +57,32 @@ function applyMode(mode) {
     const root = document.documentElement;
 
     if (mode === 'dark') {
-        root.style.setProperty('--background-color', '#1C1C1C');
-        root.style.setProperty('--text-color', '#000000');
+        root.style.setProperty('--background-color', '#36393F');
+        root.style.setProperty('--text-color', '#DCDDDE');
         root.style.setProperty('--second-text-color', '#FFFFFF');
-        root.style.setProperty('--border-color', '#5E5E5F');
-        root.style.setProperty('--background-message-color', '#272727');
+        root.style.setProperty('--border-color', '#51545c');
+        root.style.setProperty('--background-message-color', '#2F3136');
+        root.style.setProperty('--accent-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--online-color', '#3BA55C'); // Vert (en ligne)
+        root.style.setProperty('--offline-color', '#ED4245'); // Rouge (hors ligne)
+        root.style.setProperty('--busy-color', '#FAA61A'); // Orange (occupé)
+        root.style.setProperty('--idle-color', '#F0B126'); // Jaune (AFK)
         darkModeToggles.textContent = 'Light Mode';
     } else {
-        root.style.setProperty('--background-color', '#f5f5f5');
-        root.style.setProperty('--text-color', '#FFFFFF');
-        root.style.setProperty('--second-text-color', '#000000');
-        root.style.setProperty('--border-color', '#9C9FA8');
-        root.style.setProperty('--background-message-color', '#FFFFFF');
+        root.style.setProperty('--background-color', '#FFFFFF');
+        root.style.setProperty('--text-color', '#202225'); // Texte sombre
+        root.style.setProperty('--second-text-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--border-color', '#E3E5E8'); // Bordure claire
+        root.style.setProperty('--background-message-color', '#F6F6F7'); // Fond clair pour les messages
+        root.style.setProperty('--accent-color', '#5865F2'); // Bleu Discord
+        root.style.setProperty('--online-color', '#3BA55C'); // Vert (en ligne)
+        root.style.setProperty('--offline-color', '#ED4245'); // Rouge (hors ligne)
+        root.style.setProperty('--busy-color', '#FAA61A'); // Orange (occupé)
+        root.style.setProperty('--idle-color', '#F0B126'); // Jaune (AFK)
         darkModeToggles.textContent = 'Dark Mode';
     }
+
+
 
     // Enregistrer la préférence dans le Local Storage
     localStorage.setItem('theme', mode);
@@ -102,9 +114,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loginButton = document.getElementById('login-btn');
     const profilMenu = document.querySelector('.profil-menu');
+    const logOut = document.getElementById('logout-button');
 
     // Vérifiez si les informations utilisateur sont valides
     if (UserInfo) {
+        logOut.style.display = "flex"
         // Créer la div qui remplacera le bouton "Login"
         const profileDiv = document.createElement('div');
         profileDiv.classList.add('profile-container');
@@ -123,6 +137,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         logoutButton.id = "logout-btn";
         logoutButton.textContent = 'Log Out';
         logoutButton.addEventListener('click', handleLogout);
+        logOut.addEventListener('click', handleLogout)
 
         menu.appendChild(logoutButton);
 
@@ -157,7 +172,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const elementsToHide = [
         document.getElementById('notifications-link'),
         document.getElementById('request-link'),
-        document.getElementById('moderation-link')
+        document.getElementById('moderation-link'),
+        document.getElementById('private-message-link'),
     ];
 
     // Remove each element
@@ -167,6 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Si le bouton "Login" n'est pas déjà dans le menu
     if (!profilMenu.contains(loginButton)) {
+        logOut.style.display = 'none';
         // Créer un nouveau bouton "Login" si nécessaire
         const newLoginButton = document.createElement('button');
         newLoginButton.id = 'login-btn';

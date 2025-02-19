@@ -23,6 +23,10 @@ type User struct {
 	CreatedAt         time.Time `json:"created_at"`
 	Role              string    `json:"role"`
 	ProfilePicture    string    `json:"profile_picture"`
+	Gender            string    `json:"gender"`
+	Age               int       `json:"age"`
+	FirstName         string    `json:"first_name"`
+	LastName          string    `json:"last_name"`
 }
 
 func HashPassword(password string) (string, error) {
@@ -34,8 +38,8 @@ func CheckPassword(hashedPassword, password string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func NewUser(uuid, username, email, encryptedPassword string, createdAt time.Time, role string, profile_picture string) User {
-	newUser := User{uuid, username, email, encryptedPassword, createdAt, role, profile_picture}
+func NewUser(uuid, username, email, encryptedPassword string, createdAt time.Time, role string, profile_picture string, gender string, last_name string, first_name string, age int) User {
+	newUser := User{uuid, username, email, encryptedPassword, createdAt, role, profile_picture, gender, age, first_name, last_name}
 	return newUser
 }
 
@@ -85,11 +89,12 @@ func FetchUserByEmail(email string) (User, error) {
 		newUser.Role = v.(string)
 	}
 	if v, ok := result["created_at"]; ok && v != nil {
-		parsedTime, err := time.Parse("2006-01-02", result["created_at"].(string))
-		if err != nil {
-			fmt.Fprintln(os.Stderr, "dommage")
+		// Assurez-vous que c'est bien un type time.Time
+		if parsedTime, ok := v.(time.Time); ok {
+			newUser.CreatedAt = parsedTime
+		} else {
+			fmt.Fprintln(os.Stderr, "Erreur : created_at n'est pas un time.Time")
 		}
-		newUser.CreatedAt = parsedTime
 	}
 
 	return newUser, nil
@@ -154,6 +159,10 @@ func (u *User) ToMap() map[string]interface{} {
 	usrMap["created_at"] = u.CreatedAt.Format("2006-01-02")
 	usrMap["role"] = u.Role
 	usrMap["profile_picture"] = u.ProfilePicture
+	usrMap["last_name"] = u.LastName
+	usrMap["first_name"] = u.FirstName
+	usrMap["gender"] = u.Gender
+	usrMap["age"] = u.Age
 
 	return usrMap
 }
@@ -185,13 +194,13 @@ func RegisterUser(params map[string]interface{}) error {
 		profile_picture = RandomProfilPicture()
 	}
 
-	registerUserQuery := `INSERT INTO users (user_uuid, username, email, password, created_at, profile_picture, role )  VALUES (?, ?, ?, ?, ?, ?, ?)`
+	registerUserQuery := `INSERT INTO users (user_uuid, username, first_name, last_name, gender, age, email, password, created_at, profile_picture, role )  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
 	var err error
 
-	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["email"], params["password"], params["created_at"], profile_picture, params["role"])
+	_, err = server.RunQuery(registerUserQuery, params["user_uuid"], params["username"], params["first_name"], params["last_name"], params["gender"], params["age"], params["email"], params["password"], params["created_at"], profile_picture, params["role"])
 
 	if err != nil {
-		return err
+		return fmt.Errorf("erreur lors de l'insertion de l'utilisateur : %v", err)
 	}
 
 	return nil

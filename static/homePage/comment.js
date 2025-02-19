@@ -7,6 +7,8 @@ import { FetchAdminRequest, FetchHistoryRequest } from "./apiRequests.js";
 import { fetchAllcomments } from "./showComment.js";
 import { getPPFromID } from "./utils.js";
 import { createComment } from "./apiComments.js";
+import { showFriendsList } from "./direct-message.js";
+// import { initializeChat } from "./direct-message.js";
 
 const AppState = {
     HOME: 'home',
@@ -15,7 +17,8 @@ const AppState = {
     TREND: "trending",
     NOTIFS: "notification",
     REQUEST: "request",
-    MODERATION: "moderation"
+    MODERATION: "moderation",
+    DIRECT_MESSAGE: "Direct Message"
 };
 
 // Map pour stocker les event listeners
@@ -78,6 +81,8 @@ export function updateAppState(newState, pushState = true) {
             title.textContent = "Moderation";
             FetchAdminRequest();
             break;
+        case AppState.DIRECT_MESSAGE:
+            showFriendsList();
         default:
             newState.type = AppState.HOME;
             title.textContent = 'General';
@@ -106,11 +111,15 @@ export function updateAppState(newState, pushState = true) {
             case AppState.REQUEST:
                 url = "#request";
                 break;
+            case AppState.DIRECT_MESSAGE:
+                url = "#direct-message";
+                break;
             default:
                 url = '#home';
                 break;
         }
-        history.pushState(newState, '', url);
+        window.history.pushState({}, "", url);
+
     }
 }
 
@@ -326,3 +335,8 @@ document.getElementById('moderation-link').addEventListener('click', function (e
     e.preventDefault();
     updateAppState({ type: AppState.MODERATION });
 });
+
+document.getElementById('private-message-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    updateAppState({ type: AppState.DIRECT_MESSAGE })
+})
